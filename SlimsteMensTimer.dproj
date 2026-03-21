@@ -1,0 +1,90 @@
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <ProjectGuid>{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}</ProjectGuid>
+    <MainSource>SlimsteMensTimer.dpr</MainSource>
+    <Base>True</Base>
+    <Config Condition="'$(Config)'==''">Debug</Config>
+    <Platform Condition="'$(Platform)'==''">Android</Platform>
+    <FrameworkType>FMX</FrameworkType>
+    <ProjectVersion>20.1</ProjectVersion>
+    <AppType>Application</AppType>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Config)'=='Base' or '$(Base)'!=''">
+    <Base>true</Base>
+  </PropertyGroup>
+  <PropertyGroup Condition="('$(Platform)'=='Android' and '$(Base)'=='') or '$(Base_Android)'!=''">
+    <Base_Android>true</Base_Android>
+    <CfgParent>Base</CfgParent>
+    <Base>true</Base>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Config)'=='Debug' or '$(Cfg_1)'!=''">
+    <Cfg_1>true</Cfg_1>
+    <CfgParent>Base</CfgParent>
+    <Base>true</Base>
+  </PropertyGroup>
+  <PropertyGroup Condition="('$(Platform)'=='Android' and '$(Cfg_1)'!='') or '$(Cfg_1_Android)'!=''">
+    <Cfg_1_Android>true</Cfg_1_Android>
+    <CfgParent>Cfg_1</CfgParent>
+    <Base>true</Base>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Config)'=='Release' or '$(Cfg_2)'!=''">
+    <Cfg_2>true</Cfg_2>
+    <CfgParent>Base</CfgParent>
+    <Base>true</Base>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Base)'!=''">
+    <DCC_DcuOutput>.\bin\$(Platform)\$(Config)</DCC_DcuOutput>
+    <DCC_ExeOutput>.\bin\$(Platform)\$(Config)</DCC_ExeOutput>
+    <DCC_E>false</DCC_E>
+    <DCC_N>false</DCC_N>
+    <DCC_S>false</DCC_S>
+    <DCC_F>false</DCC_F>
+    <DCC_K>false</DCC_K>
+    <VerInfo_MajorVer>1</VerInfo_MajorVer>
+    <VerInfo_MinorVer>0</VerInfo_MinorVer>
+    <VerInfo_Release>0</VerInfo_Release>
+    <VerInfo_Build>0</VerInfo_Build>
+    <VerInfo_Keys>CompanyName=;FileDescription=;FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductName=;ProductVersion=1.0.0.0;Comments=</VerInfo_Keys>
+    <VerInfo_Locale>1043</VerInfo_Locale>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Base_Android)'!=''">
+    <DCC_Namespace>System;Xml;Data;Datasnap;Web;Soap;Androidapi;$(DCC_Namespace)</DCC_Namespace>
+    <EnabledSysJars>android-support-v4.dex.jar;fmx.dex.jar</EnabledSysJars>
+    <Android_Application_Theme>@android:style/Theme.NoTitleBar.Fullscreen</Android_Application_Theme>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Cfg_1)'!=''">
+    <DCC_Define>DEBUG;$(DCC_Define)</DCC_Define>
+    <DCC_Optimize>false</DCC_Optimize>
+    <DCC_GenerateStackFrames>true</DCC_GenerateStackFrames>
+    <DCC_DebugInfoInExe>true</DCC_DebugInfoInExe>
+    <DCC_RemoteDebug>true</DCC_RemoteDebug>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Cfg_2)'!=''">
+    <DCC_LocalDebugSymbols>false</DCC_LocalDebugSymbols>
+    <DCC_Define>RELEASE;$(DCC_Define)</DCC_Define>
+    <DCC_SymbolReferenceInfo>0</DCC_SymbolReferenceInfo>
+    <DCC_DebugInformation>0</DCC_DebugInformation>
+  </PropertyGroup>
+  <ItemGroup>
+    <DelphiCompile Include="$(MainSource)">
+      <MainSource>MainSource</MainSource>
+    </DelphiCompile>
+    <DCCReference Include="src\MainFrm.pas">
+      <Form>MainForm</Form>
+      <FormType>fmx</FormType>
+    </DCCReference>
+    <BuildConfiguration Include="Debug">
+      <Key>Cfg_1</Key>
+      <CfgParent>Base</CfgParent>
+    </BuildConfiguration>
+    <BuildConfiguration Include="Base">
+      <Key>Base</Key>
+    </BuildConfiguration>
+    <BuildConfiguration Include="Release">
+      <Key>Cfg_2</Key>
+      <CfgParent>Base</CfgParent>
+    </BuildConfiguration>
+  </ItemGroup>
+  <Import Project="$(BDS)\Bin\CodeGear.Delphi.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Delphi.Targets')"/>
+  <Import Project="$(APPDATA)\Embarcadero\$(BDSAPPDATADIR)\UserTools.proj" Condition="Exists('$(APPDATA)\Embarcadero\$(BDSAPPDATADIR)\UserTools.proj')"/>
+</Project>

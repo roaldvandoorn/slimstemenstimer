@@ -1,0 +1,13 @@
+Background:
+I want to build an android app built with Delphi / Firemonkey to be used in conjunction with the "De Slimste Mens" board game. The app will be a replacement for the board games own timer devices. This is a new app, and there are no existing source files.
+
+The timer / scoring app is a simple app with a countdown timer that is initially set to 60 seconds. When pressing the start/stop button, the score starts counting down at 1 point per second. When pressed again, the timer stops counting down. There are 2 more buttons, marked +20 and -20, which add or subtract 20 seconds / points from the current score.
+
+The app will only have to have a portrait oriented layout. The layout of the screen is so that the score is displayed more prominently at the top, centered in the screen. The 3 buttons are below that. From left to right they are +20, start/stop, -20. The background is a slightly darker red. The score and text on the buttons is white. The buttons themselves are round, and slightly orange/yellow in color.
+
+Instructions:
+1. Create a plan to be executed by claude code. Make sure the plan is available in a readable format in the claude subfolder.
+2. Include steps on UI design, functional code and testing.
+3. Make the steps small, and individually executable.
+4. Include instructions so that claude code follows the generic instructions of this project, it's memory and it's description
+5. Make sure claude code stops to check in with the developer after each step.

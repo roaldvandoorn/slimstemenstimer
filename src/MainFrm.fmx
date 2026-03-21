@@ -1,0 +1,108 @@
+object MainForm: TMainForm
+  Left = 0
+  Top = 0
+  Caption = 'SlimsteMensTimer'
+  ClientHeight = 628
+  ClientWidth = 375
+  FormFactor.Width = 320
+  FormFactor.Height = 480
+  FormFactor.Orientations = [Portrait]
+  FormFactor.Devices = [Desktop]
+  OnCreate = FormCreate
+  DesignerMasterStyle = 0
+  object tmrCountdown: TTimer
+    Enabled = False
+    OnTimer = tmrCountdownTimer
+  end
+  object rectBackground: TRectangle
+    Align = Client
+    Fill.Color = xFFB71C1C
+    Size.Width = 375.000000000000000000
+    Size.Height = 628.000000000000000000
+    Size.PlatformDefault = False
+    object lblScore: TLabel
+      Anchors = [akLeft, akTop, akRight]
+      StyledSettings = [Family, Style]
+      Position.Y = 128.000000000000000000
+      Size.Width = 375.000000000000000000
+      Size.Height = 200.000000000000000000
+      Size.PlatformDefault = False
+      TextSettings.Font.Size = 150.000000000000000000
+      TextSettings.FontColor = claWhite
+      TextSettings.HorzAlign = Center
+      Text = '60'
+    end
+    object btnMinus20: TCircle
+      Anchors = [akLeft, akBottom]
+      Fill.Color = xFFFFA726
+      Position.X = 18.000000000000000000
+      Position.Y = 467.000000000000000000
+      Size.Width = 100.000000000000000000
+      Size.Height = 100.000000000000000000
+      Size.PlatformDefault = False
+      Stroke.Color = claWhite
+      OnClick = txtMinus20Click
+      object txtMinus20: TText
+        Align = Client
+        Size.Width = 100.000000000000000000
+        Size.Height = 100.000000000000000000
+        Size.PlatformDefault = False
+        Text = '-20'
+        HorzTextAlign = Center
+        VertTextAlign = Center
+        TextSettings.Font.Size = 24.000000000000000000
+        TextSettings.Font.StyleExt = {00070000000000000004000000}
+        TextSettings.FontColor = claWhite
+        OnClick = txtMinus20Click
+      end
+    end
+    object btnStartStop: TCircle
+      Anchors = [akLeft, akBottom]
+      Fill.Color = xFFFFA726
+      Position.X = 138.000000000000000000
+      Position.Y = 467.000000000000000000
+      Size.Width = 100.000000000000000000
+      Size.Height = 100.000000000000000000
+      Size.PlatformDefault = False
+      Stroke.Color = claWhite
+      OnClick = txtStartStopClick
+      object txtStartStop: TText
+        Align = Client
+        Size.Width = 100.000000000000000000
+        Size.Height = 100.000000000000000000
+        Size.PlatformDefault = False
+        Text = 'Start'
+        HorzTextAlign = Center
+        VertTextAlign = Center
+        TextSettings.Font.Size = 24.000000000000000000
+        TextSettings.Font.StyleExt = {00070000000000000004000000}
+        TextSettings.FontColor = claWhite
+        OnClick = txtStartStopClick
+      end
+    end
+    object btnPlus20: TCircle
+      Anchors = [akLeft, akBottom]
+      Fill.Color = xFFFFA726
+      Position.X = 258.000000000000000000
+      Position.Y = 467.000000000000000000
+      Size.Width = 100.000000000000000000
+      Size.Height = 100.000000000000000000
+      Size.PlatformDefault = False
+      Stroke.Color = claWhite
+      OnClick = txtPlus20Click
+      object txtPlus20: TText
+        Align = Client
+        Size.Width = 100.000000000000000000
+        Size.Height = 100.000000000000000000
+        Size.PlatformDefault = False
+        Text = '+20'
+        HorzTextAlign = Center
+        VertTextAlign = Center
+        TextSettings.Font.Size = 24.000000000000000000
+        TextSettings.Font.StyleExt = {00070000000000000004000000}
+        TextSettings.FontColor = claWhite
+        OnClick = txtPlus20Click
+      end
+    end
+  end
+end
