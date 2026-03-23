@@ -22,7 +22,7 @@
 | F1 | App download QR on landing page | ✅ Done |
 | F2 | End Spel + Nieuw Spel flow on scoreboard | ✅ Done |
 | F3 | Update README.md | ✅ Done |
-| F4 | Final review + documentation | ⬜ Not started |
+| F4 | Final review + documentation | ✅ Done |
 | F5 | Project presentation | ⬜ Not started |
 
 ---
@@ -33,6 +33,13 @@
 - End-to-end test passed: browser creates session → player joins via manual URL → "Online" label appears → score changes appear on scoreboard in real time
 - QR scanning silently failed during testing because the server had an active VPN; `IpAddressHelper` selected the VPN interface (10.0.x.x) instead of the LAN interface (192.168.x.x), so the QR encoded an unreachable address. Manual entry of the LAN IP bypassed this. Fix: disable VPN on the server machine before starting the server.
 - Code is correct — no code changes required for D5
+
+### 2026-03-24 — F4
+- Reviewed all new source files; three minor comment/import fixes applied:
+  - `MainFrm.pas`: removed unused `System.Threading` import (TTask no longer used after DoJoin threading fix)
+  - `ServerClient.pas`: updated IServerClient interface comment — "TTask.Run" → "TThread.CreateAnonymousThread"
+  - `ScannerFrm.pas`: corrected opening comment that incorrectly stated the .fmx stub was not required
+- No logic issues found; all server files (controllers, hub, store, monitor) reviewed and clean
 
 ### 2026-03-24 — F3
 - Rewrote `README.md` to cover both components: Android app + server

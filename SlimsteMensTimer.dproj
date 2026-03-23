@@ -305,8 +305,8 @@
         <VerInfo_Release>1</VerInfo_Release>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_2_Android64)'!=''">
-        <VerInfo_Build>14</VerInfo_Build>
-        <VerInfo_Keys>package=com.embarcadero.$(MSBuildProjectName);label=$(MSBuildProjectName);versionCode=14;versionName=1.0.14;persistent=False;restoreAnyVersion=False;installLocation=auto;largeHeap=False;theme=TitleBar;hardwareAccelerated=true;apiKey=;minSdkVersion=23;targetSdkVersion=36;FileVersion=1.0.1.14;ProductName=Slimste Mens bordspel score app</VerInfo_Keys>
+        <VerInfo_Build>15</VerInfo_Build>
+        <VerInfo_Keys>package=com.embarcadero.$(MSBuildProjectName);label=$(MSBuildProjectName);versionCode=15;versionName=1.0.14;persistent=False;restoreAnyVersion=False;installLocation=auto;largeHeap=False;theme=TitleBar;hardwareAccelerated=true;apiKey=;minSdkVersion=23;targetSdkVersion=36;FileVersion=1.0.1.15;ProductName=Slimste Mens bordspel score app</VerInfo_Keys>
         <IncludeAndroid_AdaptiveIcon>true</IncludeAndroid_AdaptiveIcon>
         <IncludeAndroid_VectorizedSplash>true</IncludeAndroid_VectorizedSplash>
         <Android_BackgroundColor>#B71C1C</Android_BackgroundColor>

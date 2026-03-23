@@ -1,6 +1,6 @@
 ﻿unit ScannerFrm;
 
-// ZXing.Delphi QR scanner form (code-only — no .fmx required).
+// ZXing.Delphi QR scanner form.
 //
 // Prerequisites:
 //   1. Add the ZXing.Delphi library root to Delphi's library search path:

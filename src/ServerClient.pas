@@ -12,8 +12,8 @@ type
   // ── IServerClient ─────────────────────────────────────────────────────────
   //
   // JoinSession is synchronous and blocking — call it from a background
-  // thread (TTask.Run) so the UI stays responsive.  Check IsConnected
-  // afterwards to determine whether the join succeeded.
+  // thread (TThread.CreateAnonymousThread) so the UI stays responsive.
+  // On success IsConnected returns True; on failure it raises an exception.
   //
   // PushScore and the heartbeat run asynchronously (TTask.Run internally).
   // ──────────────────────────────────────────────────────────────────────────
