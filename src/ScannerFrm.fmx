@@ -1,0 +1,12 @@
+object ScannerForm: TScannerForm
+  Left = 0
+  Top = 0
+  Caption = 'SlimsteMensQRScanner'
+  ClientHeight = 628
+  ClientWidth = 375
+  FormFactor.Width = 320
+  FormFactor.Height = 480
+  FormFactor.Orientations = [Portrait]
+  FormFactor.Devices = [Desktop]
+  DesignerMasterStyle = 0
+end

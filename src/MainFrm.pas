@@ -1,4 +1,4 @@
-unit MainFrm;
+﻿unit MainFrm;
 
 interface
 
@@ -7,7 +7,7 @@ uses
   System.Threading,
   FMX.Types, FMX.Controls, FMX.Forms, FMX.Graphics, FMX.Dialogs,
   FMX.Objects, FMX.StdCtrls, FMX.Controls.Presentation, FMX.DialogService,
-  ScoreManager, ServerClient;
+  ScoreManager, ServerClient, ScannerFrm;
 
 type
   TMainForm = class(TForm)
@@ -46,6 +46,7 @@ type
     FStatusPoll:   TTimer;
     procedure tmrStatusPollTimer(Sender: TObject);
     procedure StartManualJoin;
+    procedure StartJoinWithUrl(const AJoinUrl: string);
     procedure DoJoin(const AJoinUrl, APlayerName: string);
   public
     { Public declarations }
@@ -166,16 +167,22 @@ procedure TMainForm.mnuJoinGameClick(Sender: TObject);
 begin
   pnlMenu.Visible := False;
   // Offer scan vs manual entry.  "Ja" = Scannen (D4), "Nee" = Code invoeren.
+
   TDialogService.MessageDialog(
-    'Hoe wil je deelnemen?'#10'Ja = QR-scannen   Nee = Code invoeren',
+    'Wil je deelnemen via QR-Code?'#10 +
+    'Bij nee dien je zelf de gegevens'#10 +
+    'van server en sessie op te geven.',
     TMsgDlgType.mtConfirmation,
     [TMsgDlgBtn.mbYes, TMsgDlgBtn.mbNo, TMsgDlgBtn.mbCancel],
     TMsgDlgBtn.mbNo, 0,
     procedure(const AResult: TModalResult)
     begin
       if AResult = mrYes then
-        // D4: QR scan will be wired up here
-        TDialogService.ShowMessage('QR-scannen wordt geïmplementeerd in een latere versie.')
+        TScannerForm.ScanQRCode(Self,
+        procedure(const AScannedUrl: string)
+        begin
+          StartJoinWithUrl(AScannedUrl);
+        end)
       else if AResult = mrNo then
         StartManualJoin;
     end);
@@ -194,27 +201,32 @@ begin
     procedure(const AResult: TModalResult; const AValues: array of string)
     var
       JoinUrl: string;
-      NameValues: array of string;
     begin
       if AResult <> mrOk then Exit;
       JoinUrl := AValues[0].Trim;
       if JoinUrl.IsEmpty then Exit;
+      StartJoinWithUrl(JoinUrl);
+    end);
+end;
 
-      SetLength(NameValues, 1);
-      NameValues[0] := '';
-      TDialogService.InputQuery(
-        'Deelnemen aan spel',
-        ['Voer je naam in:'],
-        NameValues,
-        procedure(const AResult2: TModalResult; const AValues2: array of string)
-        var
-          PlayerName: string;
-        begin
-          if AResult2 <> mrOk then Exit;
-          PlayerName := AValues2[0].Trim;
-          if PlayerName.IsEmpty then Exit;
-          DoJoin(JoinUrl, PlayerName);
-        end);
+procedure TMainForm.StartJoinWithUrl(const AJoinUrl: string);
+var
+  NameValues: array of string;
+begin
+  SetLength(NameValues, 1);
+  NameValues[0] := '';
+  TDialogService.InputQuery(
+    'Deelnemen aan spel',
+    ['Voer je naam in:'],
+    NameValues,
+    procedure(const AResult: TModalResult; const AValues: array of string)
+    var
+      PlayerName: string;
+    begin
+      if AResult <> mrOk then Exit;
+      PlayerName := AValues[0].Trim;
+      if PlayerName.IsEmpty then Exit;
+      DoJoin(AJoinUrl, PlayerName);
     end);
 end;
 

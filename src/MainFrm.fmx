@@ -196,16 +196,15 @@ object MainForm: TMainForm
     end
     object lblStatus: TLabel
       Anchors = [akTop, akRight]
+      StyledSettings = [Family, Style]
       Position.X = 265.000000000000000000
       Position.Y = 18.000000000000000000
       Size.Width = 100.000000000000000000
       Size.Height = 24.000000000000000000
       Size.PlatformDefault = False
-      StyledSettings = [Family, Style]
       TextSettings.Font.Size = 13.000000000000000000
       TextSettings.FontColor = claWhite
       TextSettings.HorzAlign = Trailing
-      Text = ''
     end
   end
 end

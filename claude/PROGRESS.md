@@ -17,7 +17,7 @@
 | D1 | Delphi: ServerClient.pas | ✅ Done |
 | D2 | Delphi: MainFrm.fmx changes | ✅ Done |
 | D3 | Delphi: MainFrm.pas logic | ✅ Done |
-| D4 | Delphi: ZXing QR scanning | ⬜ Not started |
+| D4 | Delphi: ZXing QR scanning | ✅ Done |
 | D5 | Delphi: end-to-end test | ⬜ Not started |
 | F1 | App download QR on landing page | ⬜ Not started |
 | F2 | End Spel + Nieuw Spel flow on scoreboard | ⬜ Not started |
@@ -28,6 +28,24 @@
 ---
 
 ## Log
+
+### 2026-03-23 — D4
+- Added `CAMERA` permission + `uses-feature` to `AndroidManifest.template.xml`
+- Created `src/ScannerFrm.pas` — code-only form (no .fmx), `TScannerForm`
+  - `BuildUI`: full-screen black background, camera preview `TImage`, hint label, orange cancel button
+  - `TCameraComponent` (back camera, medium quality); started in `DoFormShow`, stopped in `DoFormClose` (which also frees the form)
+  - `CameraSampleReady`: calls `SampleBufferToBitmap` on camera thread; scans every 15th frame via `TScanManager`; on QR found, delivers result to `FOnResult` via `TThread.Queue` then closes; updates `FImgPreview` every frame via `TThread.Queue`
+  - `ScanQRCode` class method — creates and shows the form with a result callback
+- Updated `src/MainFrm.pas`:
+  - Added `ScannerFrm` to uses clause
+  - Added `StartJoinWithUrl(const AUrl: string)` — prompts for player name then calls `DoJoin`; shared by both scan and manual paths
+  - Refactored `StartManualJoin` to prompt for URL then delegate to `StartJoinWithUrl`
+  - Replaced D3 scan stub in `mnuJoinGameClick` with `TScannerForm.ScanQRCode(Self, ...)` callback
+- **Action required:**
+  1. Add ZXing.Delphi library paths to Delphi library search path (see top-of-file comment in ScannerFrm.pas)
+  2. Add `src/ScannerFrm.pas` to the project via Project > Add to Project
+  3. Build and deploy to Android
+  4. Test: tap "Aanmelden bij spel" → "Ja" → scanner opens with camera preview → scan the lobby QR code → name prompt appears → join succeeds
 
 ### 2026-03-23 — D3
 - Added `System.Threading` and `ServerClient` to uses clause
