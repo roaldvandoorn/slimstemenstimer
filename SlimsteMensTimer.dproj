@@ -8,7 +8,8 @@
         <AppType>Application</AppType>
         <FrameworkType>FMX</FrameworkType>
         <ProjectVersion>20.4</ProjectVersion>
-        <Platform Condition="'$(Platform)'==''">Android64</Platform>
+        <Platform Condition="'$(Platform)'==''">Win64</Platform>
+        <ProjectName Condition="'$(ProjectName)'==''">SlimsteMensTimer</ProjectName>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Config)'=='Base' or '$(Base)'!=''">
         <Base>true</Base>
@@ -213,15 +214,16 @@
         <AUP_WRITE_EXTERNAL_STORAGE>false</AUP_WRITE_EXTERNAL_STORAGE>
         <AUP_READ_PHONE_STATE>false</AUP_READ_PHONE_STATE>
         <AUP_READ_EXTERNAL_STORAGE>false</AUP_READ_EXTERNAL_STORAGE>
-        <AUP_CAMERA>false</AUP_CAMERA>
         <AUP_CALL_PHONE>false</AUP_CALL_PHONE>
         <AUP_ACCESS_FINE_LOCATION>false</AUP_ACCESS_FINE_LOCATION>
         <AUP_ACCESS_COARSE_LOCATION>false</AUP_ACCESS_COARSE_LOCATION>
-        <AUP_INTERNET>false</AUP_INTERNET>
         <PF_KeyStore>C:\Users\rtvdo\AppData\Roaming\Embarcadero\BDS\37.0\roald.keystore</PF_KeyStore>
         <PF_KeyStorePass>850747D05F820784CF75E534A4587BF5E41F0519A05A97D897C80FA28E363C94DB04A390E34B1C31C1B15774FAD1C339BABA3609043F22FC1657458CE5A722CFC949F31FD555FAFEBFE4AF0D07551D589201</PF_KeyStorePass>
         <PF_AliasKey>google profile</PF_AliasKey>
+        <AUP_ACCESS_NETWORK_STATE>true</AUP_ACCESS_NETWORK_STATE>
         <VerInfo_Release>1</VerInfo_Release>
+        <AUP_ACCESS_WIFI_STATE>true</AUP_ACCESS_WIFI_STATE>
+        <AUP_NEARBY_WIFI_DEVICES>true</AUP_NEARBY_WIFI_DEVICES>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base_Win32)'!=''">
         <DCC_Namespace>Winapi;System.Win;Data.Win;Datasnap.Win;Web.Win;Soap.Win;Xml.Win;Bde;$(DCC_Namespace)</DCC_Namespace>
@@ -304,8 +306,8 @@
         <VerInfo_Release>1</VerInfo_Release>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_2_Android64)'!=''">
-        <VerInfo_Build>6</VerInfo_Build>
-        <VerInfo_Keys>package=com.embarcadero.$(MSBuildProjectName);label=$(MSBuildProjectName);versionCode=6;versionName=1.0.1;persistent=False;restoreAnyVersion=False;installLocation=auto;largeHeap=False;theme=TitleBar;hardwareAccelerated=true;apiKey=;minSdkVersion=23;targetSdkVersion=36;FileVersion=1.0.1.6;ProductName=Slimste Mens bordspel score app</VerInfo_Keys>
+        <VerInfo_Build>11</VerInfo_Build>
+        <VerInfo_Keys>package=com.embarcadero.$(MSBuildProjectName);label=$(MSBuildProjectName);versionCode=11;versionName=1.0.1;persistent=False;restoreAnyVersion=False;installLocation=auto;largeHeap=False;theme=TitleBar;hardwareAccelerated=true;apiKey=;minSdkVersion=23;targetSdkVersion=36;FileVersion=1.0.1.11;ProductName=Slimste Mens bordspel score app</VerInfo_Keys>
         <IncludeAndroid_AdaptiveIcon>true</IncludeAndroid_AdaptiveIcon>
         <IncludeAndroid_VectorizedSplash>true</IncludeAndroid_VectorizedSplash>
         <Android_BackgroundColor>#B71C1C</Android_BackgroundColor>
@@ -314,6 +316,8 @@
         <BT_BuildType>AppStore</BT_BuildType>
         <VerInfo_Release>1</VerInfo_Release>
         <VerInfo_AutoIncVersion>true</VerInfo_AutoIncVersion>
+        <AUP_ACCESS_NETWORK_STATE>true</AUP_ACCESS_NETWORK_STATE>
+        <AUP_ACCESS_WIFI_STATE>true</AUP_ACCESS_WIFI_STATE>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_2_Win32)'!=''">
         <AppDPIAwarenessMode>PerMonitorV2</AppDPIAwarenessMode>
@@ -854,6 +858,13 @@
                 <DeployFile LocalName="bin\Win64\Release\SlimsteMensTimer.exe" Configuration="Release" Class="ProjectOutput">
                     <Platform Name="Win64">
                         <RemoteName>SlimsteMensTimer.exe</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="res\network_security_config.xml" Configuration="Debug" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>res\xml\</RemoteDir>
+                        <RemoteName>network_security_config.xml</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>

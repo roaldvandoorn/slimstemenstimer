@@ -103,7 +103,7 @@ object MainForm: TMainForm
     object btnMenu: TRectangle
       Fill.Color = xFFFFA726
       Position.X = 10.000000000000000000
-      Position.Y = 10.000000000000000000
+      Position.Y = 25.000000000000000000
       Size.Width = 50.000000000000000000
       Size.Height = 50.000000000000000000
       Size.PlatformDefault = False

@@ -175,6 +175,11 @@ Create `claude/PLAN.md` and `claude/PROGRESS.md`.
   - Proceed to player name dialog
 - Manual entry fallback: prompts for full join URL (e.g. `http://192.168.1.5:5000/join/XK7P3Q`)
 
+**Implementation notes (from D4 execution):**
+- Do NOT deactivate `TCameraComponent` inside `DoFormClose` — this hangs the ZXing camera component; `caFree` alone is sufficient
+- A minimal `ScannerFrm.fmx` stub IS required alongside the `.pas` file — `{$R *.fmx}` causes `EResNotFound` at runtime without it
+- Use a named `reference to procedure` type (`TOnResultProc`) for the scan callback instead of `TProc<string>` — avoids compiler overload resolution errors
+
 ✅ Check in before D5.
 
 ---

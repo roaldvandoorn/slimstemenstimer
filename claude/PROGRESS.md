@@ -31,21 +31,19 @@
 
 ### 2026-03-23 — D4
 - Added `CAMERA` permission + `uses-feature` to `AndroidManifest.template.xml`
-- Created `src/ScannerFrm.pas` — code-only form (no .fmx), `TScannerForm`
+- Created `src/ScannerFrm.pas` — `TScannerForm`
   - `BuildUI`: full-screen black background, camera preview `TImage`, hint label, orange cancel button
-  - `TCameraComponent` (back camera, medium quality); started in `DoFormShow`, stopped in `DoFormClose` (which also frees the form)
-  - `CameraSampleReady`: calls `SampleBufferToBitmap` on camera thread; scans every 15th frame via `TScanManager`; on QR found, delivers result to `FOnResult` via `TThread.Queue` then closes; updates `FImgPreview` every frame via `TThread.Queue`
-  - `ScanQRCode` class method — creates and shows the form with a result callback
+  - `TCameraComponent` (back camera, high quality, continuous autofocus); started in `DoFormShow`
+  - `CameraSampleReady`: calls `SampleBufferToBitmap` on camera thread; scans every 15th frame via `TScanManager`; on QR found, delivers result to `FOnResult` via `TThread.Queue` then closes; updates preview every frame via `TThread.Queue`
+  - `DoFormClose`: sets `caFree` — camera is NOT deactivated here (deactivating inside `DoFormClose` hangs the ZXing camera component)
+  - `ScanQRCode` class method — takes `TOnResultProc` (named `reference to procedure` type) instead of `TProc<string>` to avoid compiler overload resolution issues
+  - `{$R *.fmx}` directive required — an `.fmx` file IS needed (bare-minimum stub `ScannerFrm.fmx`), otherwise `EResNotFound` is raised at runtime
+- Created `src/ScannerFrm.fmx` — minimal stub (empty form declaration required by `{$R *.fmx}`)
 - Updated `src/MainFrm.pas`:
   - Added `ScannerFrm` to uses clause
   - Added `StartJoinWithUrl(const AUrl: string)` — prompts for player name then calls `DoJoin`; shared by both scan and manual paths
   - Refactored `StartManualJoin` to prompt for URL then delegate to `StartJoinWithUrl`
-  - Replaced D3 scan stub in `mnuJoinGameClick` with `TScannerForm.ScanQRCode(Self, ...)` callback
-- **Action required:**
-  1. Add ZXing.Delphi library paths to Delphi library search path (see top-of-file comment in ScannerFrm.pas)
-  2. Add `src/ScannerFrm.pas` to the project via Project > Add to Project
-  3. Build and deploy to Android
-  4. Test: tap "Aanmelden bij spel" → "Ja" → scanner opens with camera preview → scan the lobby QR code → name prompt appears → join succeeds
+  - Replaced D3 scan stub with `TScannerForm.ScanQRCode(Self, ...)` using `TOnResultProc` callback
 
 ### 2026-03-23 — D3
 - Added `System.Threading` and `ServerClient` to uses clause

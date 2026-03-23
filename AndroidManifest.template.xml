@@ -24,6 +24,7 @@
 
     <application
         android:debuggable="%debuggable%"
+        android:networkSecurityConfig="@xml/network_security_config" 
         android:hardwareAccelerated="%hardwareAccelerated%"
         android:icon="%icon%"
         android:label="%label%"
