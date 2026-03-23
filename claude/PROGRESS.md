@@ -10,9 +10,10 @@
 | S2 | Server: models + SessionStore | ✅ Done |
 | S3 | Server: REST API | ✅ Done |
 | S4 | Server: SignalR hub | ✅ Done |
-| S5 | Server: HeartbeatMonitor | ⬜ Not started |
-| S6 | Server: web UI | ⬜ Not started |
-| S7 | Server: integration test | ⬜ Not started |
+| S5 | Server: Postman collection | ✅ Done |
+| S6 | Server: HeartbeatMonitor | ✅ Done |
+| S7 | Server: web UI | ⬜ Not started |
+| S8 | Server: integration test | ⬜ Not started |
 | D1 | Delphi: ServerClient.pas | ⬜ Not started |
 | D2 | Delphi: MainFrm.fmx changes | ⬜ Not started |
 | D3 | Delphi: MainFrm.pas logic | ⬜ Not started |
@@ -24,6 +25,20 @@
 ---
 
 ## Log
+
+### 2026-03-23 — S5 + S6
+- **S5**: Created `postman/SlimsteMensTimerServer.postman_collection.json` (Postman v2.1)
+  - Collection variables: `baseUrl`, `sessionId`, `playerId`, `playerId2`
+  - 3 folders: Sessions (4 requests), Players (5 requests), QR Code (1 request)
+  - Test scripts auto-capture `sessionId` (Create Session) and `playerId`/`playerId2` (Register Player 1/2)
+  - All requests include status code assertions
+  - Import via Postman: File > Import > select the JSON file
+- **S6**: Implemented `Services/HeartbeatMonitor.cs`
+  - Reads `StaleSeconds` and `SessionTimeoutHours` from `appsettings.json`
+  - Every 5 s: marks players stale + broadcasts `PlayerWentStale`; ends idle sessions + broadcasts `GameEnded`
+  - `OperationCanceledException` handled cleanly for graceful shutdown
+  - Recovery (`PlayerReturned`) handled in controllers — not duplicated here
+- **Action required:** Build in VS 2022; import Postman collection; run Create Session → register players → Start Session → Update Score and confirm responses
 
 ### 2026-03-23 — S4
 - Implemented `Hubs/GameHub.cs`: injects `SessionStore` to validate session on group join

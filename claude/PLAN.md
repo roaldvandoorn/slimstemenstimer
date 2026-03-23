@@ -62,18 +62,32 @@ Create `claude/PLAN.md` and `claude/PROGRESS.md`.
 
 ---
 
-### S5 — Heartbeat monitor
+### S5 — Postman collection
+- Create `postman/SlimsteMensTimerServer.postman_collection.json` (Postman Collection v2.1)
+- Collection variable: `baseUrl` = `http://localhost:5000`
+- Auto-capture variables via test scripts: `sessionId` (from Create Session response), `playerId` (from Register Player response)
+- Folders and requests:
+  - **Sessions**: Create Session, Get Session, Start Session, Delete Session
+  - **Players**: Register Player, Get Players, Update Score, Heartbeat
+  - **QR Code**: Get QR Code (saves response as PNG)
+- Each request pre-populated with correct URL, method, headers (`Content-Type: application/json`), and example body where applicable
+
+✅ Check in before S6.
+
+---
+
+### S6 — Heartbeat monitor
 - Implement `HeartbeatMonitor` as `BackgroundService`
 - Every 5 seconds: check all players in Active sessions against `StaleSeconds` threshold
 - On stale detection: set `IsStale = true`, broadcast `PlayerWentStale` via SignalR
 - On recovery (score push / heartbeat from stale player): set `IsStale = false`, broadcast `PlayerReturned`
 - Register in DI as hosted service
 
-✅ Check in before S6.
+✅ Check in before S7.
 
 ---
 
-### S6 — Web UI
+### S7 — Web UI
 - Write `wwwroot/lobby.html` + `lobby.js`:
   - Landing: "Nieuwe Sessie" button → `POST /api/sessions` → navigate to `/lobby/{sessionId}`
   - Lobby view: QR code (`<img src="/api/sessions/{id}/qr">`), 6-char session code in large text, player list, "Start Spel" button
@@ -86,16 +100,16 @@ Create `claude/PLAN.md` and `claude/PROGRESS.md`.
 - Add `/join/{sessionId}` route (controller or minimal API) that redirects to lobby or scoreboard depending on session state
 - Include `signalr.min.js` (local copy from CDN or npm)
 
-✅ Check in before S7.
+✅ Check in before S8.
 
 ---
 
-### S7 — Server integration test (manual)
+### S8 — Server integration test (manual)
 - Run server; confirm it resolves and displays LAN IP in startup log
 - Browser: create session, verify QR code is displayed and encodes correct join URL
-- Postman/curl: register two players, push score updates, confirm scoreboard tiles update in real time
+- Use Postman collection (from S5): run requests in order — create session, register two players, push score updates; confirm scoreboard tiles update in real time
 - Let 30 s pass without heartbeat; confirm tile goes grey
-- Resume heartbeat; confirm tile returns to normal
+- Resume heartbeat via Postman; confirm tile returns to normal
 
 ✅ Check in before D1.
 
