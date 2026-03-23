@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>De Slimste Mens — Lobby</title>
+  <link rel="stylesheet" href="/css/style.css" />
+</head>
+<body>
+<div class="container">
+
+  <div class="title">De Slimste Mens</div>
+
+  <!-- Banner (hidden until an event requires it) -->
+  <div class="banner" id="bannerWrap" style="display:none">
+    <span id="bannerText"></span>
+  </div>
+
+  <!-- ── Landing view ─────────────────────────────────────── -->
+  <div id="landing" class="landing">
+    <p>Maak een nieuwe sessie aan en laat spelers scannen om mee te doen.</p>
+    <button id="btnNewSession" class="btn">Nieuwe Sessie</button>
+  </div>
+
+  <!-- ── Lobby view ───────────────────────────────────────── -->
+  <div id="lobby" style="display:none">
+    <div class="lobby-layout">
+
+      <!-- QR + session code -->
+      <div class="card qr-section">
+        <span class="qr-label">Scan om mee te doen</span>
+        <img id="qrImage" src="" alt="QR code" />
+        <span class="session-code" id="sessionCode"></span>
+      </div>
+
+      <!-- Player list + start button -->
+      <div class="card players-section">
+        <h2>Spelers</h2>
+        <ul class="player-list" id="playerList">
+          <li class="empty-hint">Wacht op spelers…</li>
+        </ul>
+        <button id="btnStartGame" class="btn" disabled>Start Spel</button>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+<script src="/js/signalr.min.js"></script>
+<script src="/js/lobby.js"></script>
+</body>
+</html>

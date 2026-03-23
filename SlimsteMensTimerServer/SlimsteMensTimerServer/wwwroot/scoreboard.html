@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>De Slimste Mens — Scorebord</title>
+  <link rel="stylesheet" href="/css/style.css" />
+</head>
+<body>
+<div class="container">
+
+  <div class="title">De Slimste Mens</div>
+
+  <div class="session-subtitle" id="sessionSubtitle"></div>
+
+  <!-- Banner: shown when GameEnded or session not found -->
+  <div class="banner" id="banner" style="display:none"></div>
+
+  <!-- Scoreboard grid — tiles are added dynamically -->
+  <div class="scoreboard-grid" id="scoreGrid"></div>
+
+</div>
+
+<script src="/js/signalr.min.js"></script>
+<script src="/js/scoreboard.js"></script>
+</body>
+</html>

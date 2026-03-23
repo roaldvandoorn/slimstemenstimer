@@ -1,4 +1,5 @@
 using SlimsteMensTimerServer.Hubs;
+using SlimsteMensTimerServer.Models;
 using SlimsteMensTimerServer.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -49,9 +50,14 @@ app.MapControllers();
 app.MapHub<GameHub>("/gamehub");
 
 // /join/{sessionId} — deep-link target encoded in the QR code.
-// Redirects to the lobby page with the session ID as a query parameter.
-app.MapGet("/join/{sessionId}", (string sessionId) =>
-    Results.Redirect($"/lobby.html?session={sessionId}"));
+// Redirects to scoreboard when session is Active, otherwise to lobby.
+app.MapGet("/join/{sessionId}", (string sessionId, SessionStore store) =>
+{
+    var session = store.GetSession(sessionId);
+    if (session is null) return Results.Redirect("/lobby.html");
+    var page = session.State == SessionState.Active ? "scoreboard" : "lobby";
+    return Results.Redirect($"/{page}.html?session={sessionId}");
+});
 
 // Log the server's LAN address on startup so it's easy to find
 app.Lifetime.ApplicationStarted.Register(() =>

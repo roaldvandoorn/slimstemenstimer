@@ -12,19 +12,33 @@
 | S4 | Server: SignalR hub | ✅ Done |
 | S5 | Server: Postman collection | ✅ Done |
 | S6 | Server: HeartbeatMonitor | ✅ Done |
-| S7 | Server: web UI | ⬜ Not started |
+| S7 | Server: web UI | ✅ Done |
 | S8 | Server: integration test | ⬜ Not started |
 | D1 | Delphi: ServerClient.pas | ⬜ Not started |
 | D2 | Delphi: MainFrm.fmx changes | ⬜ Not started |
 | D3 | Delphi: MainFrm.pas logic | ⬜ Not started |
 | D4 | Delphi: ZXing QR scanning | ⬜ Not started |
 | D5 | Delphi: end-to-end test | ⬜ Not started |
-| F1 | Update README.md | ⬜ Not started |
-| F2 | Final review + documentation | ⬜ Not started |
+| F1 | App download QR on landing page | ⬜ Not started |
+| F2 | End Spel + Nieuw Spel flow on scoreboard | ⬜ Not started |
+| F3 | Update README.md | ⬜ Not started |
+| F4 | Final review + documentation | ⬜ Not started |
+| F5 | Project presentation | ⬜ Not started |
 
 ---
 
 ## Log
+
+### 2026-03-23 — S7
+- Created `wwwroot/css/style.css`: dark red `#B71C1C` bg, orange `#FFA726` accents, responsive grid, `.player-tile.stale` dim style
+- Created `wwwroot/lobby.html`: landing (new session button) + lobby layout (QR image, session code, player list, Start Spel button)
+- Created `wwwroot/scoreboard.html`: session subtitle + dynamic player tile grid
+- Created `wwwroot/js/lobby.js`: creates session, loads players, SignalR events `PlayerJoined` / `GameStarted` / `GameEnded`
+- Created `wwwroot/js/scoreboard.js`: loads players on mount, SignalR events `PlayerJoined` / `ScoreUpdated` / `PlayerWentStale` / `PlayerReturned` / `GameEnded`
+- Downloaded `wwwroot/js/signalr.min.js` (SignalR 8.0.0 local copy)
+- Updated `wwwroot/index.html`: meta-refresh redirect to `lobby.html`
+- Updated `Program.cs` `/join/{sessionId}` route: redirects to scoreboard when session is Active, lobby otherwise
+- **Action required:** Build in VS 2022; open `http://localhost:5000` → create session → verify QR + player list appear; use Postman to register players and confirm lobby updates in real time; click Start Spel and confirm scoreboard navigation
 
 ### 2026-03-23 — S5 + S6
 - **S5**: Created `postman/SlimsteMensTimerServer.postman_collection.json` (Postman v2.1)

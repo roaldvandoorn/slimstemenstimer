@@ -191,14 +191,71 @@ Create `claude/PLAN.md` and `claude/PROGRESS.md`.
 
 ## Phase 3 — Final
 
-### F1 — Update README.md
+### F1 — App download QR on landing page
+- On the landing page (before any session is created), show a QR code that encodes the static Google Play internal test link: `https://play.google.com/apps/internaltest/4701444685052336832`
+- QR is generated server-side via a new endpoint `GET /api/appqr` (reuses `QrController` logic, no session required) or as a static pre-generated PNG in `wwwroot/`
+- Displayed below the "Nieuwe Sessie" button with a small label ("Download de app")
+- Not visible on the lobby page (session already in progress) or scoreboard
+
+✅ Check in before F2.
+
+---
+
+### F2 — End Spel + Nieuw Spel flow on scoreboard
+- Add an "End Spel" button to `scoreboard.html` (host-side, bottom of page)
+  - Calls `DELETE /api/sessions/{id}` → broadcasts `GameEnded` to all clients
+  - On success: button replaced with "Nieuw Spel" button
+- "Nieuw Spel" navigates back to `/lobby.html` (fresh landing, no session)
+- `GameEnded` event (received via SignalR by other browser tabs) already shows the banner; update the banner to also include a "Nieuw Spel" link
+- No auth required — host is whoever has the scoreboard URL open
+
+✅ Check in before F3.
+
+---
+
+### F3 — Update README.md
 - Add server setup and run instructions
 - Add network requirements (same LAN)
 - Add build instructions for both components
 
-### F2 — Final review and documentation
+### F4 — Final review and documentation
 - Review all new code for cleanup
 - Update `PROGRESS.md` with final status
 - Confirm all tests still pass
+
+✅ Check in before F5.
+
+---
+
+### F5 — Project presentation
+Create a slide-deck style Markdown presentation (`claude/presentation.md`) covering the full project history across both phases.
+
+**Structure:**
+
+1. **Introduction** — what the project is; original user prompt (from `claude/archive/inital instructions.txt`)
+2. **Phase 1 — Android app (Steps 1–9)**
+   - Step 1: Delphi project scaffolding — new FMX Android project, portrait lock
+   - Step 2: UI layout — dark red background, score label, three round orange buttons
+   - Step 3: Timer logic — countdown, Start/Stop, ±20 buttons
+   - Step 4: Style refinement — font sizes, color tuning, visual polish
+   - Step 5: Hamburger menu — Reset score, Score instellen (0–1000 dialog), Afsluiten
+   - Step 6: ScoreManager class — `IScoreManager` interface, `TScoreManager`, decorator-ready design, `EArgumentOutOfRangeException` contract
+   - Step 7: DUnitX unit tests — 20 tests covering all `TScoreManager` methods, edge cases, exception assertions
+   - Step 8: Android build & device testing — deployed and verified on device
+   - Step 9: Final review & README
+3. **Phase 2 — Multiplayer extension (S1–S8, D1–D5)**
+   - S1: ASP.NET Core 8 server scaffolding — SignalR, CORS, Swagger, static files
+   - S2: Models + SessionStore — `Session`, `Player`, `SessionState`, thread-safe in-memory store
+   - S3: REST API — sessions, players, score push, heartbeat, QR code endpoint
+   - S4: SignalR hub — `GameHub`, session groups, real-time events
+   - S5: Postman collection — 10 requests across 3 folders, auto-capture test scripts
+   - S6: HeartbeatMonitor — `BackgroundService`, stale detection, session idle timeout
+   - S7: Web UI — `lobby.html`, `scoreboard.html`, `lobby.js`, `scoreboard.js`, `style.css`, local SignalR client
+   - D1–D5: Delphi client — `IServerClient`, `TServerClient`, `TServerAwareScoreManager` decorator, join/leave flow, QR scanning (planned)
+4. **Architecture overview** — component diagram (ASCII), key technology choices and rationale
+5. **Key design decisions** — interface + decorator pattern; offline-first app; in-memory store; SignalR for browser only (REST for app); session code readability (unambiguous charset)
+6. **Prompts used** — the original prompt from `claude/archive/inital instructions.txt` verbatim; the multiplayer extension request reconstructed from `claude/archive/PROJECT.md` and `PLAN.md` context (no Claude Code memory entries were saved for this project)
+
+**Output:** `claude/presentation.md` — each slide as a `---`-delimited Markdown section, suitable for rendering in a Markdown slideshow tool (e.g. Marp, Slidev, or VS Code Markdown Preview)
 
 ✅ Project complete.
