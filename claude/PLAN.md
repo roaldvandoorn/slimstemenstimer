@@ -90,7 +90,62 @@ Deliverables:
 
 ---
 
-## Step 5 — Android Build & Device Testing
+## Step 5 — Hamburger Menu with Reset, Score Input & Exit
+
+**Goal:** Add a collapsible menu in the top-left corner with three actions.
+
+### Design decisions
+
+#### Menu button
+- Component: `TRectangle` (~50×50, top-left, `Position.X=10, Position.Y=10`, `XRadius/YRadius=8` for slight rounding)
+- Child `TText` with "☰" (Unicode hamburger, font ~28pt, white)
+- Fill color: same orange as existing buttons (`#FFA726`) to stay consistent
+- `OnClick` handler on the TRectangle: toggles menu panel visibility
+
+#### Menu panel
+- Component: `TRectangle` (width ~200, auto-height, positioned below the menu button, `Position.X=10, Position.Y=65`)
+- Fill: dark semi-transparent (`#CC1A0000`) so the score remains legible behind it
+- `Visible = False` by default; shown/hidden by the menu button tap
+- Three `TText` children stacked vertically (each ~50pt tall, white, 18pt font, left-aligned with padding):
+  1. "Reset score"
+  2. "Score instellen"
+  3. "Afsluiten"
+- Each `TText` has its own `OnClick` handler
+- Panel is always rendered on top (last child of `rectBackground`, so it paints over other elements)
+
+#### "Reset score" action
+- Sets `FScore := 60`, updates `lblScore.Text`
+- Also stops the timer if running and resets `txtStartStop.Text` to `'Start'`
+- Hides the menu panel
+
+#### "Score instellen" action
+- Uses FMX's built-in `InputQuery` (from `FMX.Dialogs`) — native Android input dialog, no extra components needed
+- Prompt: `'Score instellen'`, caption: `'Voer een getal in (0–1000):'`
+- Validates result: must be a valid integer in range 0–1000; ignores/rejects invalid input
+- On confirmation: sets `FScore` to the entered value, updates `lblScore.Text`, hides menu panel
+
+#### "Afsluiten" action
+- Calls `Application.Terminate`
+
+### Tasks
+- [ ] Add `btnMenu` (TRectangle) + `txtMenu` (TText "☰") to `MainFrm.fmx`
+- [ ] Add `pnlMenu` (TRectangle) + three TText items to `MainFrm.fmx`
+- [ ] Declare new components and handlers in `MainFrm.pas`
+- [ ] Implement `btnMenuClick`: toggle `pnlMenu.Visible`
+- [ ] Implement `mnuResetClick`: reset score, stop timer, hide menu
+- [ ] Implement `mnuSetScoreClick`: InputQuery, validate, apply score, hide menu
+- [ ] Implement `mnuExitClick`: `Application.Terminate`
+- [ ] Add `FMX.Dialogs` and `FMX.Platform` to uses clause if not already present
+
+### Deliverables
+- Updated `MainFrm.fmx` with menu button and panel
+- Updated `MainFrm.pas` with all handlers
+
+✅ Check in with developer before proceeding to Step 6.
+
+---
+
+## Step 6 — Android Build & Device Testing
 **Goal:** Build and deploy the app to an Android device or emulator.
 
 Tasks:
@@ -103,16 +158,20 @@ Tasks:
   - +20 and -20 adjust score correctly
   - Timer counts down correctly
   - Timer stops at 0
+  - Hamburger menu opens/closes correctly
+  - Reset score works
+  - Score instellen dialog accepts valid input
+  - Afsluiten closes the app
 
 Deliverables:
 - Successful Android APK build
 - Verified functionality on device
 
-✅ Check in with developer before proceeding to Step 6.
+✅ Check in with developer before proceeding to Step 7.
 
 ---
 
-## Step 6 — Final Review & Documentation
+## Step 7 — Final Review & Documentation
 **Goal:** Wrap up the project with documentation and final checks.
 
 Tasks:
@@ -126,3 +185,62 @@ Deliverables:
 - Updated `PROGRESS.md`
 
 ✅ Project complete — final check in with developer.
+
+---
+
+## Step 8 — Score Manager Class
+
+**Goal:** Extract score state and logic into a separate, testable class.
+
+### New file: `src/ScoreManager.pas`
+
+#### Interface: `IScoreManager`
+```pascal
+IScoreManager = interface
+  ['{GUID}']
+  procedure Increase(AAmount: Integer);
+  procedure Decrease(AAmount: Integer);
+  procedure SetScore(AValue: Integer);
+  procedure Reset;
+  function GetScore: Integer;
+  property Score: Integer read GetScore;
+end;
+```
+
+#### Class: `TScoreManager`
+- Inherits from `TInterfacedObject` (automatic reference counting; held as `IScoreManager` in the form — no manual `Free` needed)
+- Private field `FScore: Integer`
+- Rules:
+  - `Increase(AAmount)`: adds `AAmount` to `FScore`, **no upper cap**
+  - `Decrease(AAmount)`: subtracts `AAmount`, clamps to minimum 0 (`Max(0, FScore - AAmount)`)
+  - `SetScore(AValue)`: raises `EArgumentOutOfRangeException` if `AValue < 0` or `AValue > 1000`; otherwise sets `FScore`
+  - `Reset`: sets `FScore := 60`
+  - `GetScore`: returns `FScore`
+
+Note: the `mnuSetScoreClick` handler in `MainFrm.pas` already validates the range (0–1000) before calling `SetScore`, so the exception in `SetScore` acts as a contract guard rather than a user-facing error.
+
+### Changes to `MainFrm.pas`
+- Remove `FScore: Integer`; add `FScoreManager: IScoreManager`
+- In `FormCreate`: `FScoreManager := TScoreManager.Create`
+- Add `ScoreManager` to the `uses` clause
+
+| Current code | Replacement |
+|---|---|
+| `FScore := 60` | `FScoreManager.Reset` |
+| `FScore := Max(0, FScore - 20)` | `FScoreManager.Decrease(20)` |
+| `FScore := FScore + 20` | `FScoreManager.Increase(20)` |
+| `FScore := NewScore` | `FScoreManager.SetScore(NewScore)` |
+| `Dec(FScore)` | `FScoreManager.Decrease(1)` |
+| `FScore <= 0` | `FScoreManager.Score <= 0` |
+| `lblScore.Text := FScore.ToString` | `lblScore.Text := FScoreManager.Score.ToString` |
+
+### What is not changing
+- The FMX form layout — no `.fmx` changes
+- All existing handler signatures stay the same
+- No test project created yet (future step)
+
+### Deliverables
+- New `src/ScoreManager.pas`
+- Updated `src/MainFrm.pas`
+
+✅ Check in with developer before proceeding to Step 9.

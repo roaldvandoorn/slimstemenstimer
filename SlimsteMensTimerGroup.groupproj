@@ -1,0 +1,48 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <ProjectGuid>{1683A5C4-D8EF-4F58-87D1-A3D0E5CAF813}</ProjectGuid>
+    </PropertyGroup>
+    <ItemGroup>
+        <Projects Include="SlimsteMensTimer.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="tests\SlimsteMensTimerTests.dproj">
+            <Dependencies/>
+        </Projects>
+    </ItemGroup>
+    <ProjectExtensions>
+        <Borland.Personality>Default.Personality.12</Borland.Personality>
+        <Borland.ProjectType/>
+        <BorlandProject>
+            <Default.Personality/>
+        </BorlandProject>
+    </ProjectExtensions>
+    <Target Name="SlimsteMensTimer">
+        <MSBuild Projects="SlimsteMensTimer.dproj"/>
+    </Target>
+    <Target Name="SlimsteMensTimer:Clean">
+        <MSBuild Projects="SlimsteMensTimer.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="SlimsteMensTimer:Make">
+        <MSBuild Projects="SlimsteMensTimer.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="SlimsteMensTimerTests">
+        <MSBuild Projects="tests\SlimsteMensTimerTests.dproj"/>
+    </Target>
+    <Target Name="SlimsteMensTimerTests:Clean">
+        <MSBuild Projects="tests\SlimsteMensTimerTests.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="SlimsteMensTimerTests:Make">
+        <MSBuild Projects="tests\SlimsteMensTimerTests.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="Build">
+        <CallTarget Targets="SlimsteMensTimer;SlimsteMensTimerTests"/>
+    </Target>
+    <Target Name="Clean">
+        <CallTarget Targets="SlimsteMensTimer:Clean;SlimsteMensTimerTests:Clean"/>
+    </Target>
+    <Target Name="Make">
+        <CallTarget Targets="SlimsteMensTimer:Make;SlimsteMensTimerTests:Make"/>
+    </Target>
+    <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
+</Project>

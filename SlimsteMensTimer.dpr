@@ -3,7 +3,8 @@ program SlimsteMensTimer;
 uses
   System.StartUpCopy,
   FMX.Forms,
-  MainFrm in 'src\MainFrm.pas' {MainForm};
+  MainFrm in 'src\MainFrm.pas' {MainForm},
+  ScoreManager in 'src\ScoreManager.pas';
 
 {$R *.res}
 

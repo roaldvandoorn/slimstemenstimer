@@ -13,6 +13,8 @@ object MainForm: TMainForm
   object tmrCountdown: TTimer
     Enabled = False
     OnTimer = tmrCountdownTimer
+    Left = 88
+    Top = 8
   end
   object rectBackground: TRectangle
     Align = Client
@@ -96,6 +98,75 @@ object MainForm: TMainForm
         TextSettings.Font.StyleExt = {00070000000000000004000000}
         TextSettings.FontColor = claWhite
         OnClick = txtPlus20Click
+      end
+    end
+    object btnMenu: TRectangle
+      Fill.Color = xFFFFA726
+      Position.X = 10.000000000000000000
+      Position.Y = 10.000000000000000000
+      Size.Width = 50.000000000000000000
+      Size.Height = 50.000000000000000000
+      Size.PlatformDefault = False
+      Stroke.Color = claWhite
+      XRadius = 8.000000000000000000
+      YRadius = 8.000000000000000000
+      OnClick = btnMenuClick
+      object txtMenu: TText
+        Align = Client
+        Size.Width = 50.000000000000000000
+        Size.Height = 50.000000000000000000
+        Size.PlatformDefault = False
+        Text = #9776
+        TextSettings.Font.Size = 28.000000000000000000
+        TextSettings.FontColor = claWhite
+        OnClick = btnMenuClick
+      end
+    end
+    object pnlMenu: TRectangle
+      Fill.Color = xCC000000
+      Position.X = 10.000000000000000000
+      Position.Y = 65.000000000000000000
+      Size.Width = 220.000000000000000000
+      Size.Height = 150.000000000000000000
+      Size.PlatformDefault = False
+      Stroke.Color = claWhite
+      Visible = False
+      XRadius = 6.000000000000000000
+      YRadius = 6.000000000000000000
+      object mnuReset: TText
+        Position.X = 10.000000000000000000
+        Size.Width = 210.000000000000000000
+        Size.Height = 50.000000000000000000
+        Size.PlatformDefault = False
+        Text = 'Reset score'
+        TextSettings.Font.Size = 18.000000000000000000
+        TextSettings.FontColor = claWhite
+        TextSettings.HorzAlign = Leading
+        OnClick = mnuResetClick
+      end
+      object mnuSetScore: TText
+        Position.X = 10.000000000000000000
+        Position.Y = 50.000000000000000000
+        Size.Width = 210.000000000000000000
+        Size.Height = 50.000000000000000000
+        Size.PlatformDefault = False
+        Text = 'Score instellen'
+        TextSettings.Font.Size = 18.000000000000000000
+        TextSettings.FontColor = claWhite
+        TextSettings.HorzAlign = Leading
+        OnClick = mnuSetScoreClick
+      end
+      object mnuExit: TText
+        Position.X = 10.000000000000000000
+        Position.Y = 100.000000000000000000
+        Size.Width = 210.000000000000000000
+        Size.Height = 50.000000000000000000
+        Size.PlatformDefault = False
+        Text = 'Afsluiten'
+        TextSettings.Font.Size = 18.000000000000000000
+        TextSettings.FontColor = claWhite
+        TextSettings.HorzAlign = Leading
+        OnClick = mnuExitClick
       end
     end
   end
