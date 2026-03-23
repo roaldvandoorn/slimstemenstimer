@@ -4,7 +4,8 @@ uses
   System.StartUpCopy,
   FMX.Forms,
   MainFrm in 'src\MainFrm.pas' {MainForm},
-  ScoreManager in 'src\ScoreManager.pas';
+  ScoreManager in 'src\ScoreManager.pas',
+  ServerClient in 'src\ServerClient.pas';
 
 {$R *.res}
 

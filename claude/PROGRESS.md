@@ -13,10 +13,10 @@
 | S5 | Server: Postman collection | ✅ Done |
 | S6 | Server: HeartbeatMonitor | ✅ Done |
 | S7 | Server: web UI | ✅ Done |
-| S8 | Server: integration test | ⬜ Not started |
-| D1 | Delphi: ServerClient.pas | ⬜ Not started |
-| D2 | Delphi: MainFrm.fmx changes | ⬜ Not started |
-| D3 | Delphi: MainFrm.pas logic | ⬜ Not started |
+| S8 | Server: integration test | ✅ Done |
+| D1 | Delphi: ServerClient.pas | ✅ Done |
+| D2 | Delphi: MainFrm.fmx changes | ✅ Done |
+| D3 | Delphi: MainFrm.pas logic | ✅ Done |
 | D4 | Delphi: ZXing QR scanning | ⬜ Not started |
 | D5 | Delphi: end-to-end test | ⬜ Not started |
 | F1 | App download QR on landing page | ⬜ Not started |
@@ -28,6 +28,33 @@
 ---
 
 ## Log
+
+### 2026-03-23 — D3
+- Added `System.Threading` and `ServerClient` to uses clause
+- Added `FServerClient: IServerClient` (initialised in `FormCreate` as `TServerClient.Create`)
+- Added `FStatusPoll: TTimer` (5 s, created programmatically in `FormCreate`; updates `lblStatus` → "Online" / "Offline" / empty based on `IsConnected` and `SessionId`)
+- `mnuJoinGameClick`: hides menu; shows `MessageDialog` with Ja=Scannen (D4 stub) / Nee=Code invoeren / Cancel; "Nee" chains two `InputQuery` dialogs (join URL → player name) then calls `DoJoin`
+- `DoJoin`: runs `FServerClient.JoinSession` in `TTask.Run`; on success swaps `FScoreManager` to `TServerAwareScoreManager`, shows `mnuLeaveGame`, hides `mnuJoinGame`; on failure shows error message
+- `mnuLeaveGameClick`: calls `LeaveSession`, swaps back to plain `TScoreManager`, restores menu visibility, clears `lblStatus`
+- **Action required:** In Delphi IDE confirm `ServerClient.pas` is in the project. Build and deploy — verify "Aanmelden bij spel" and "Afmelden" menu items work; "Afmelden" is hidden until joined; `lblStatus` updates every 5 s
+
+### 2026-03-23 — D2
+- `MainFrm.fmx`: extended `pnlMenu` height 150 → 250
+- Added `mnuJoinGame: TText` at Y=150 — "Aanmelden bij spel"
+- Added `mnuLeaveGame: TText` at Y=200 — "Afmelden" (`Visible=False`)
+- Added `lblStatus: TLabel` top-right (X=265, Y=18, 100×24, 13pt, right-aligned, white, empty)
+- `MainFrm.pas`: declared `mnuJoinGame`, `mnuLeaveGame`, `lblStatus`; declared and stubbed `mnuJoinGameClick` / `mnuLeaveGameClick` (implemented in D3)
+- **Action required:** Build in Delphi IDE — confirm no compile errors and the menu panel shows the two new items
+
+### 2026-03-23 — S8
+- Manual integration test passed: session creation, QR code, player registration via Postman, real-time score updates, stale detection (30 s), recovery via heartbeat, GameEnded banner, `/join` redirect to scoreboard when Active
+
+### 2026-03-23 — D1
+- Created `src/ServerClient.pas`
+- `IServerClient` interface with GUID; `JoinSession`, `LeaveSession`, `PushScore`, `IsConnected`, `PlayerName`, `SessionId`
+- `TServerClient` (TInterfacedObject): `THTTPClient` (System.Net.HttpClient) per request; `JoinSession` is synchronous/blocking (call from TTask.Run in D3); `PushScore` and heartbeat are fire-and-forget via `TTask.Run`; heartbeat `TTimer` (15 s) enabled/disabled on main thread via `TThread.Queue`; failure counter (3 → offline); stale-callback guard (`FPlayerId = ''` check)
+- `TServerAwareScoreManager` (TInterfacedObject, IScoreManager): delegates all methods to FInner; calls `FClient.PushScore` after each mutation when connected
+- **Action required:** In Delphi IDE, add `src/ServerClient.pas` to the project via Project > Add to Project. Build to confirm no compile errors.
 
 ### 2026-03-23 — S7
 - Created `wwwroot/css/style.css`: dark red `#B71C1C` bg, orange `#FFA726` accents, responsive grid, `.player-tile.stale` dim style

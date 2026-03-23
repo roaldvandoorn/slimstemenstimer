@@ -4,9 +4,10 @@ interface
 
 uses
   System.SysUtils, System.Types, System.UITypes, System.Classes,
+  System.Threading,
   FMX.Types, FMX.Controls, FMX.Forms, FMX.Graphics, FMX.Dialogs,
   FMX.Objects, FMX.StdCtrls, FMX.Controls.Presentation, FMX.DialogService,
-  ScoreManager;
+  ScoreManager, ServerClient;
 
 type
   TMainForm = class(TForm)
@@ -25,6 +26,9 @@ type
     mnuReset: TText;
     mnuSetScore: TText;
     mnuExit: TText;
+    mnuJoinGame: TText;
+    mnuLeaveGame: TText;
+    lblStatus: TLabel;
     procedure FormCreate(Sender: TObject);
     procedure tmrCountdownTimer(Sender: TObject);
     procedure txtMinus20Click(Sender: TObject);
@@ -34,8 +38,15 @@ type
     procedure mnuResetClick(Sender: TObject);
     procedure mnuSetScoreClick(Sender: TObject);
     procedure mnuExitClick(Sender: TObject);
+    procedure mnuJoinGameClick(Sender: TObject);
+    procedure mnuLeaveGameClick(Sender: TObject);
   private
     FScoreManager: IScoreManager;
+    FServerClient: IServerClient;
+    FStatusPoll:   TTimer;
+    procedure tmrStatusPollTimer(Sender: TObject);
+    procedure StartManualJoin;
+    procedure DoJoin(const AJoinUrl, APlayerName: string);
   public
     { Public declarations }
   end;
@@ -50,8 +61,28 @@ implementation
 procedure TMainForm.FormCreate(Sender: TObject);
 begin
   FScoreManager := TScoreManager.Create;
+  FServerClient := TServerClient.Create;
   lblScore.Text := FScoreManager.Score.ToString;
+
+  FStatusPoll          := TTimer.Create(Self);
+  FStatusPoll.Interval := 5000;
+  FStatusPoll.OnTimer  := tmrStatusPollTimer;
+  FStatusPoll.Enabled  := True;
 end;
+
+// ── Status poll ───────────────────────────────────────────────────────────────
+
+procedure TMainForm.tmrStatusPollTimer(Sender: TObject);
+begin
+  if FServerClient.IsConnected then
+    lblStatus.Text := 'Online'
+  else if FServerClient.SessionId <> '' then
+    lblStatus.Text := 'Offline'
+  else
+    lblStatus.Text := '';
+end;
+
+// ── Countdown timer ───────────────────────────────────────────────────────────
 
 procedure TMainForm.tmrCountdownTimer(Sender: TObject);
 begin
@@ -63,6 +94,8 @@ begin
   end;
   lblScore.Text := FScoreManager.Score.ToString;
 end;
+
+// ── Score buttons ─────────────────────────────────────────────────────────────
 
 procedure TMainForm.txtStartStopClick(Sender: TObject);
 begin
@@ -84,6 +117,8 @@ begin
   FScoreManager.Increase(20);
   lblScore.Text := FScoreManager.Score.ToString;
 end;
+
+// ── Menu ──────────────────────────────────────────────────────────────────────
 
 procedure TMainForm.btnMenuClick(Sender: TObject);
 begin
@@ -123,6 +158,96 @@ end;
 procedure TMainForm.mnuExitClick(Sender: TObject);
 begin
   Application.Terminate;
+end;
+
+// ── Join / Leave ──────────────────────────────────────────────────────────────
+
+procedure TMainForm.mnuJoinGameClick(Sender: TObject);
+begin
+  pnlMenu.Visible := False;
+  // Offer scan vs manual entry.  "Ja" = Scannen (D4), "Nee" = Code invoeren.
+  TDialogService.MessageDialog(
+    'Hoe wil je deelnemen?'#10'Ja = QR-scannen   Nee = Code invoeren',
+    TMsgDlgType.mtConfirmation,
+    [TMsgDlgBtn.mbYes, TMsgDlgBtn.mbNo, TMsgDlgBtn.mbCancel],
+    TMsgDlgBtn.mbNo, 0,
+    procedure(const AResult: TModalResult)
+    begin
+      if AResult = mrYes then
+        // D4: QR scan will be wired up here
+        TDialogService.ShowMessage('QR-scannen wordt geïmplementeerd in een latere versie.')
+      else if AResult = mrNo then
+        StartManualJoin;
+    end);
+end;
+
+procedure TMainForm.StartManualJoin;
+var
+  UrlValues: array of string;
+begin
+  SetLength(UrlValues, 1);
+  UrlValues[0] := '';
+  TDialogService.InputQuery(
+    'Deelnemen aan spel',
+    ['Voer de join-URL in (bijv. http://192.168.1.5:5000/join/XK7P3Q):'],
+    UrlValues,
+    procedure(const AResult: TModalResult; const AValues: array of string)
+    var
+      JoinUrl: string;
+      NameValues: array of string;
+    begin
+      if AResult <> mrOk then Exit;
+      JoinUrl := AValues[0].Trim;
+      if JoinUrl.IsEmpty then Exit;
+
+      SetLength(NameValues, 1);
+      NameValues[0] := '';
+      TDialogService.InputQuery(
+        'Deelnemen aan spel',
+        ['Voer je naam in:'],
+        NameValues,
+        procedure(const AResult2: TModalResult; const AValues2: array of string)
+        var
+          PlayerName: string;
+        begin
+          if AResult2 <> mrOk then Exit;
+          PlayerName := AValues2[0].Trim;
+          if PlayerName.IsEmpty then Exit;
+          DoJoin(JoinUrl, PlayerName);
+        end);
+    end);
+end;
+
+procedure TMainForm.DoJoin(const AJoinUrl, APlayerName: string);
+begin
+  TTask.Run(procedure
+  begin
+    FServerClient.JoinSession(AJoinUrl, APlayerName);
+    TThread.Queue(nil, procedure
+    begin
+      if FServerClient.IsConnected then
+      begin
+        FScoreManager        := TServerAwareScoreManager.Create(
+                                  TScoreManager.Create, FServerClient);
+        mnuJoinGame.Visible  := False;
+        mnuLeaveGame.Visible := True;
+        lblStatus.Text       := 'Online';
+      end
+      else
+        TDialogService.ShowMessage(
+          'Kan geen verbinding maken met de server.'#10'Controleer de URL en probeer opnieuw.');
+    end);
+  end);
+end;
+
+procedure TMainForm.mnuLeaveGameClick(Sender: TObject);
+begin
+  FServerClient.LeaveSession;
+  FScoreManager        := TScoreManager.Create;
+  mnuJoinGame.Visible  := True;
+  mnuLeaveGame.Visible := False;
+  lblStatus.Text       := '';
+  pnlMenu.Visible      := False;
 end;
 
 end.

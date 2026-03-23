@@ -127,7 +127,7 @@ object MainForm: TMainForm
       Position.X = 10.000000000000000000
       Position.Y = 65.000000000000000000
       Size.Width = 220.000000000000000000
-      Size.Height = 150.000000000000000000
+      Size.Height = 250.000000000000000000
       Size.PlatformDefault = False
       Stroke.Color = claWhite
       Visible = False
@@ -168,6 +168,44 @@ object MainForm: TMainForm
         TextSettings.HorzAlign = Leading
         OnClick = mnuExitClick
       end
+      object mnuJoinGame: TText
+        Position.X = 10.000000000000000000
+        Position.Y = 150.000000000000000000
+        Size.Width = 210.000000000000000000
+        Size.Height = 50.000000000000000000
+        Size.PlatformDefault = False
+        Text = 'Aanmelden bij spel'
+        TextSettings.Font.Size = 18.000000000000000000
+        TextSettings.FontColor = claWhite
+        TextSettings.HorzAlign = Leading
+        OnClick = mnuJoinGameClick
+      end
+      object mnuLeaveGame: TText
+        Position.X = 10.000000000000000000
+        Position.Y = 200.000000000000000000
+        Size.Width = 210.000000000000000000
+        Size.Height = 50.000000000000000000
+        Size.PlatformDefault = False
+        Text = 'Afmelden'
+        TextSettings.Font.Size = 18.000000000000000000
+        TextSettings.FontColor = claWhite
+        TextSettings.HorzAlign = Leading
+        Visible = False
+        OnClick = mnuLeaveGameClick
+      end
+    end
+    object lblStatus: TLabel
+      Anchors = [akTop, akRight]
+      Position.X = 265.000000000000000000
+      Position.Y = 18.000000000000000000
+      Size.Width = 100.000000000000000000
+      Size.Height = 24.000000000000000000
+      Size.PlatformDefault = False
+      StyledSettings = [Family, Style]
+      TextSettings.Font.Size = 13.000000000000000000
+      TextSettings.FontColor = claWhite
+      TextSettings.HorzAlign = Trailing
+      Text = ''
     end
   end
 end
