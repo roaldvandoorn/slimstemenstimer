@@ -1,246 +1,190 @@
-# De Slimste Mens Timer — Execution Plan
+# De Slimste Mens Timer — Multiplayer Extension Plan
 
 ## Purpose
-Step-by-step plan for building the De Slimste Mens Timer Android app in Delphi/FireMonkey.
-Each step is small and individually executable. Claude stops after each step to check in with the developer.
+Step-by-step plan for adding a server-side session manager and real-time scoreboard to the existing SlimsteMensTimer Android app. Each step is small and individually executable. Claude stops after each step to check in with the developer.
+
+For full architecture details, technology decisions, and component design, see the approved design plan.
 
 ---
 
-## Step 1 — Create the Delphi Project
-**Goal:** Set up a new FireMonkey Android project in Delphi.
+## Preliminary
 
-Tasks:
-- Create a new FireMonkey Mobile Application project in Delphi
-- Name the project `SlimsteMensTimer`
-- Set the target platform to Android
-- Save the project to `D:\Projects\slimstemenstimer\`
-- Lock orientation to Portrait only (in Project > Options > Application > Orientation)
-- Save and confirm the project builds without errors
+### P0 — Update CLAUDE.md ✅
+Update project guidance to reflect dual-component architecture (Android app + ASP.NET Core server).
 
-Deliverables:
-- `SlimsteMensTimer.dpr`
-- `SlimsteMensTimer.dproj`
-- `Unit1.pas` / `Unit1.fmx`
-
-✅ Check in with developer before proceeding to Step 2.
+### P1 — Project documentation ✅
+Create `claude/PLAN.md` and `claude/PROGRESS.md`.
 
 ---
 
-## Step 2 — Design the UI Layout
-**Goal:** Set up the visual layout of the main form with correct colors and structure.
+## Phase 1 — Server
 
-Tasks:
-- Set form background color to a dark red (`#B71C1C` or similar)
-- Add a `TLabel` for the score display:
-  - Large font, white, centered, positioned in the upper half of the screen
-  - Name: `lblScore`
-  - Text: `60`
-- Add three `TCircle` or styled `TButton` components for the buttons:
-  - Name: `btnMinus20`, `btnStartStop`, `btnPlus20`
-  - Labels: `-20`, `Start`, `+20`
-  - Round shape, orange/yellow color (`#FFA726` or similar), white text
-  - Laid out horizontally below the score label
-- Ensure layout looks correct in portrait orientation on a typical Android screen
+### S1 — Project scaffolding
+- Create ASP.NET Core 8 Web API project in VS 2022
+- Solution: `SlimsteMensTimerServer/SlimsteMensTimerServer.sln`
+- Add NuGet packages: `QRCoder`
+- Configure `Program.cs`: SignalR, CORS (allow all origins), static files
+- Configure `appsettings.json`: Port 5000, StaleSeconds 30
+- Confirm project builds and runs
 
-Deliverables:
-- Updated `Unit1.fmx` with the visual layout
-
-✅ Check in with developer before proceeding to Step 3.
+✅ Check in before S2.
 
 ---
 
-## Step 3 — Implement Timer Logic
-**Goal:** Add the countdown timer functionality.
+### S2 — Models + SessionStore
+- Implement `SessionState` enum: `Lobby`, `Active`, `Ended`
+- Implement `Player` model: `Id`, `Name`, `Score`, `LastSeen`, `IsStale`
+- Implement `Session` model: `Id`, `State`, `Players` (`ConcurrentDictionary`), `CreatedAt`, `LastActivity`
+- Implement `SessionStore` (singleton): thread-safe create/read/update/delete via `ConcurrentDictionary<string, Session>`
+- Implement `IpAddressHelper`: resolves LAN IP for building `joinUrl`
+- Register services in DI
 
-Tasks:
-- Add a `TTimer` component to the form (Name: `tmrCountdown`, Interval: 1000ms, Enabled: False)
-- Declare a variable `FScore: Integer` in the form class
-- On form create: set `FScore := 60` and update `lblScore`
-- On `tmrCountdown.OnTimer`:
-  - Decrement `FScore` by 1
-  - Update `lblScore.Text`
-  - If `FScore <= 0`: stop the timer, set score to 0
-- Implement `btnStartStop.OnClick`:
-  - Toggle `tmrCountdown.Enabled`
-  - Update button label: "Start" when stopped, "Stop" when running
-- Implement `btnPlus20.OnClick`: add 20 to `FScore`, update label
-- Implement `btnMinus20.OnClick`: subtract 20 from `FScore` (minimum 0), update label
-
-Deliverables:
-- Updated `Unit1.pas` with full timer logic
-
-✅ Check in with developer before proceeding to Step 4.
+✅ Check in before S3.
 
 ---
 
-## Step 4 — Style Refinement
-**Goal:** Polish the visual appearance to match the spec.
+### S3 — REST API
+- Implement `SessionsController`: `POST /api/sessions`, `GET /api/sessions/{id}`, `POST /api/sessions/{id}/start`, `DELETE /api/sessions/{id}`
+- Implement `PlayersController`: `POST /api/sessions/{id}/players`, `GET /api/sessions/{id}/players`, `PUT /api/sessions/{id}/players/{pid}/score`, `POST /api/sessions/{id}/players/{pid}/heartbeat`
+- Wire `IHubContext<GameHub>` into controllers to broadcast SignalR events on state changes
+- Return correct HTTP status codes (201, 200, 204, 404, 409, 422)
 
-Tasks:
-- Verify button roundness (use `TSpeedButton` with rounded style, or `TCircle` with overlay label)
-- Ensure font sizes are appropriate for typical Android screen sizes
-- Check colors match spec: dark red background, orange/yellow buttons, white text
-- Add a title label or app name if desired
-- Verify portrait lock is working correctly
-
-Deliverables:
-- Visually polished `Unit1.fmx`
-
-✅ Check in with developer before proceeding to Step 5.
+✅ Check in before S4.
 
 ---
 
-## Step 5 — Hamburger Menu with Reset, Score Input & Exit
+### S4 — SignalR hub
+- Implement `GameHub` with `JoinSessionGroup(sessionId)` method
+- Register hub in `Program.cs` at `/gamehub`
+- Confirm hub connects from browser console
 
-**Goal:** Add a collapsible menu in the top-left corner with three actions.
-
-### Design decisions
-
-#### Menu button
-- Component: `TRectangle` (~50×50, top-left, `Position.X=10, Position.Y=10`, `XRadius/YRadius=8` for slight rounding)
-- Child `TText` with "☰" (Unicode hamburger, font ~28pt, white)
-- Fill color: same orange as existing buttons (`#FFA726`) to stay consistent
-- `OnClick` handler on the TRectangle: toggles menu panel visibility
-
-#### Menu panel
-- Component: `TRectangle` (width ~200, auto-height, positioned below the menu button, `Position.X=10, Position.Y=65`)
-- Fill: dark semi-transparent (`#CC1A0000`) so the score remains legible behind it
-- `Visible = False` by default; shown/hidden by the menu button tap
-- Three `TText` children stacked vertically (each ~50pt tall, white, 18pt font, left-aligned with padding):
-  1. "Reset score"
-  2. "Score instellen"
-  3. "Afsluiten"
-- Each `TText` has its own `OnClick` handler
-- Panel is always rendered on top (last child of `rectBackground`, so it paints over other elements)
-
-#### "Reset score" action
-- Sets `FScore := 60`, updates `lblScore.Text`
-- Also stops the timer if running and resets `txtStartStop.Text` to `'Start'`
-- Hides the menu panel
-
-#### "Score instellen" action
-- Uses FMX's built-in `InputQuery` (from `FMX.Dialogs`) — native Android input dialog, no extra components needed
-- Prompt: `'Score instellen'`, caption: `'Voer een getal in (0–1000):'`
-- Validates result: must be a valid integer in range 0–1000; ignores/rejects invalid input
-- On confirmation: sets `FScore` to the entered value, updates `lblScore.Text`, hides menu panel
-
-#### "Afsluiten" action
-- Calls `Application.Terminate`
-
-### Tasks
-- [ ] Add `btnMenu` (TRectangle) + `txtMenu` (TText "☰") to `MainFrm.fmx`
-- [ ] Add `pnlMenu` (TRectangle) + three TText items to `MainFrm.fmx`
-- [ ] Declare new components and handlers in `MainFrm.pas`
-- [ ] Implement `btnMenuClick`: toggle `pnlMenu.Visible`
-- [ ] Implement `mnuResetClick`: reset score, stop timer, hide menu
-- [ ] Implement `mnuSetScoreClick`: InputQuery, validate, apply score, hide menu
-- [ ] Implement `mnuExitClick`: `Application.Terminate`
-- [ ] Add `FMX.Dialogs` and `FMX.Platform` to uses clause if not already present
-
-### Deliverables
-- Updated `MainFrm.fmx` with menu button and panel
-- Updated `MainFrm.pas` with all handlers
-
-✅ Check in with developer before proceeding to Step 6.
+✅ Check in before S5.
 
 ---
 
-## Step 6 — Android Build & Device Testing
-**Goal:** Build and deploy the app to an Android device or emulator.
+### S5 — Heartbeat monitor
+- Implement `HeartbeatMonitor` as `BackgroundService`
+- Every 5 seconds: check all players in Active sessions against `StaleSeconds` threshold
+- On stale detection: set `IsStale = true`, broadcast `PlayerWentStale` via SignalR
+- On recovery (score push / heartbeat from stale player): set `IsStale = false`, broadcast `PlayerReturned`
+- Register in DI as hosted service
 
-Tasks:
-- Configure Android SDK path in Delphi if not already done
-- Set the build target to Android
-- Build the project (check for compile errors)
-- Deploy to emulator or physical device
-- Test all button interactions:
-  - Start/Stop toggles correctly
-  - +20 and -20 adjust score correctly
-  - Timer counts down correctly
-  - Timer stops at 0
-  - Hamburger menu opens/closes correctly
-  - Reset score works
-  - Score instellen dialog accepts valid input
-  - Afsluiten closes the app
-
-Deliverables:
-- Successful Android APK build
-- Verified functionality on device
-
-✅ Check in with developer before proceeding to Step 7.
+✅ Check in before S6.
 
 ---
 
-## Step 7 — Final Review & Documentation
-**Goal:** Wrap up the project with documentation and final checks.
+### S6 — Web UI
+- Write `wwwroot/lobby.html` + `lobby.js`:
+  - Landing: "Nieuwe Sessie" button → `POST /api/sessions` → navigate to `/lobby/{sessionId}`
+  - Lobby view: QR code (`<img src="/api/sessions/{id}/qr">`), 6-char session code in large text, player list, "Start Spel" button
+  - SignalR: `JoinSessionGroup`, listen for `PlayerJoined`, `GameStarted`
+- Write `wwwroot/scoreboard.html` + `scoreboard.js`:
+  - On load: `GET /api/sessions/{id}/players` to hydrate tiles
+  - SignalR: listen for `ScoreUpdated`, `PlayerJoined`, `PlayerWentStale`, `PlayerReturned`, `GameEnded`
+  - Player tiles: name + score, grey when stale
+- Write `wwwroot/css/style.css`: dark red `#B71C1C` background, orange `#FFA726` accents, white text — matching app palette
+- Add `/join/{sessionId}` route (controller or minimal API) that redirects to lobby or scoreboard depending on session state
+- Include `signalr.min.js` (local copy from CDN or npm)
 
-Tasks:
+✅ Check in before S7.
+
+---
+
+### S7 — Server integration test (manual)
+- Run server; confirm it resolves and displays LAN IP in startup log
+- Browser: create session, verify QR code is displayed and encodes correct join URL
+- Postman/curl: register two players, push score updates, confirm scoreboard tiles update in real time
+- Let 30 s pass without heartbeat; confirm tile goes grey
+- Resume heartbeat; confirm tile returns to normal
+
+✅ Check in before D1.
+
+---
+
+## Phase 2 — Delphi client
+
+### D1 — ServerClient.pas
+- Implement `IServerClient` interface
+- Implement `TServerClient`:
+  - `TNetHTTPClient` (built-in FMX)
+  - All HTTP via `TTask.Run` (non-blocking)
+  - `JoinSession`: `POST /api/sessions/{id}/players`, store `FPlayerId`, `FBaseUrl`, `FSessionId`
+  - `PushScore`: `PUT .../score` body `{ "score": n }`
+  - `LeaveSession`: stops heartbeat, clears state
+  - Heartbeat `TTimer` (15 s): `POST .../heartbeat`
+  - Failure counter: 3 failures → `FConnected := False`; recovery on next success
+- Implement `TServerAwareScoreManager` (decorator over `IScoreManager`):
+  - Delegates all methods to `FInner`
+  - After each mutation calls `FClient.PushScore(FInner.Score)` when `FClient.IsConnected`
+- Add unit to Delphi project
+
+✅ Check in before D2.
+
+---
+
+### D2 — MainFrm.fmx layout changes
+- Extend `pnlMenu` height: 150 → 250
+- Add `mnuJoinGame: TText` at Y=100 — "Aanmelden bij spel"
+- Add `mnuLeaveGame: TText` at Y=150 — "Afmelden" (initially `Visible=False`)
+- Add `lblStatus: TLabel` top-right (~Position.X=300, Y=15), small font, white
+
+✅ Check in before D3.
+
+---
+
+### D3 — MainFrm.pas logic
+- Add `FServerClient: IServerClient` field; initialise in `FormCreate`
+- Add `tmrStatusPoll: TTimer` (5 s): updates `lblStatus` text from `FServerClient.IsConnected` on main thread
+- Implement `mnuJoinGameClick`:
+  1. Offer "Scannen" / "Code invoeren" choice
+  2. Manual path: `TDialogService.InputQuery` for join URL
+  3. `TDialogService.InputQuery` for player name
+  4. Call `FServerClient.JoinSession` on background thread
+  5. On success: swap `FScoreManager` → `TServerAwareScoreManager.Create(TScoreManager.Create, FServerClient)`; show `mnuLeaveGame`, hide `mnuJoinGame`
+  6. On failure: show error message; `FScoreManager` stays as plain `TScoreManager`
+- Implement `mnuLeaveGameClick`:
+  - `FServerClient.LeaveSession`
+  - Swap `FScoreManager` back to plain `TScoreManager`
+  - Show `mnuJoinGame`, hide `mnuLeaveGame`
+  - Clear `lblStatus`
+
+✅ Check in before D4.
+
+---
+
+### D4 — ZXing.Delphi QR scanning
+- Add ZXing.Delphi library to Delphi library search path
+- Add `CAMERA` permission to `AndroidManifest.template.xml`
+- Implement scan callback in `mnuJoinGameClick` "Scannen" path:
+  - Launch ZXing scanner
+  - On result: extract base URL + session ID from scanned string (parse path `/join/{sessionId}`)
+  - Proceed to player name dialog
+- Manual entry fallback: prompts for full join URL (e.g. `http://192.168.1.5:5000/join/XK7P3Q`)
+
+✅ Check in before D5.
+
+---
+
+### D5 — End-to-end integration test
+- Android device and server machine on same Wi-Fi
+- Full flow: browser creates session → player scans QR → enters name → "Online" shown → scores update on scoreboard
+- Offline test: disable Wi-Fi on device → app continues working → `lblStatus` shows "Offline"
+- Recovery: re-enable Wi-Fi → `lblStatus` returns to "Online" on next push
+
+✅ Check in before F1.
+
+---
+
+## Phase 3 — Final
+
+### F1 — Update README.md
+- Add server setup and run instructions
+- Add network requirements (same LAN)
+- Add build instructions for both components
+
+### F2 — Final review and documentation
+- Review all new code for cleanup
 - Update `PROGRESS.md` with final status
-- Write `README.md` for the project
-- Review code for any cleanup needed
-- Confirm app behaves as expected end-to-end
+- Confirm all tests still pass
 
-Deliverables:
-- `README.md`
-- Updated `PROGRESS.md`
-
-✅ Project complete — final check in with developer.
-
----
-
-## Step 8 — Score Manager Class
-
-**Goal:** Extract score state and logic into a separate, testable class.
-
-### New file: `src/ScoreManager.pas`
-
-#### Interface: `IScoreManager`
-```pascal
-IScoreManager = interface
-  ['{GUID}']
-  procedure Increase(AAmount: Integer);
-  procedure Decrease(AAmount: Integer);
-  procedure SetScore(AValue: Integer);
-  procedure Reset;
-  function GetScore: Integer;
-  property Score: Integer read GetScore;
-end;
-```
-
-#### Class: `TScoreManager`
-- Inherits from `TInterfacedObject` (automatic reference counting; held as `IScoreManager` in the form — no manual `Free` needed)
-- Private field `FScore: Integer`
-- Rules:
-  - `Increase(AAmount)`: adds `AAmount` to `FScore`, **no upper cap**
-  - `Decrease(AAmount)`: subtracts `AAmount`, clamps to minimum 0 (`Max(0, FScore - AAmount)`)
-  - `SetScore(AValue)`: raises `EArgumentOutOfRangeException` if `AValue < 0` or `AValue > 1000`; otherwise sets `FScore`
-  - `Reset`: sets `FScore := 60`
-  - `GetScore`: returns `FScore`
-
-Note: the `mnuSetScoreClick` handler in `MainFrm.pas` already validates the range (0–1000) before calling `SetScore`, so the exception in `SetScore` acts as a contract guard rather than a user-facing error.
-
-### Changes to `MainFrm.pas`
-- Remove `FScore: Integer`; add `FScoreManager: IScoreManager`
-- In `FormCreate`: `FScoreManager := TScoreManager.Create`
-- Add `ScoreManager` to the `uses` clause
-
-| Current code | Replacement |
-|---|---|
-| `FScore := 60` | `FScoreManager.Reset` |
-| `FScore := Max(0, FScore - 20)` | `FScoreManager.Decrease(20)` |
-| `FScore := FScore + 20` | `FScoreManager.Increase(20)` |
-| `FScore := NewScore` | `FScoreManager.SetScore(NewScore)` |
-| `Dec(FScore)` | `FScoreManager.Decrease(1)` |
-| `FScore <= 0` | `FScoreManager.Score <= 0` |
-| `lblScore.Text := FScore.ToString` | `lblScore.Text := FScoreManager.Score.ToString` |
-
-### What is not changing
-- The FMX form layout — no `.fmx` changes
-- All existing handler signatures stay the same
-- No test project created yet (future step)
-
-### Deliverables
-- New `src/ScoreManager.pas`
-- Updated `src/MainFrm.pas`
-
-✅ Check in with developer before proceeding to Step 9.
+✅ Project complete.

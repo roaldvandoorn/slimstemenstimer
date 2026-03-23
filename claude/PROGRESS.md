@@ -1,71 +1,64 @@
 # Progress Log
 
-## Status: Planning Phase
+## Status: In Progress
 
 | Step | Description | Status |
 |------|-------------|--------|
-| 1 | Create the Delphi Project | ✅ Done |
-| 2 | Design the UI Layout | ✅ Done |
-| 3 | Implement Timer Logic | ✅ Done |
-| 4 | Style Refinement | ✅ Done |
-| 5 | Hamburger Menu (Reset, Score instellen, Afsluiten) | ✅ Done |
-| 6 | Android Build & Device Testing | ⬜ Not started |
-| 7 | Final Review & Documentation | ⬜ Not started |
-| 8 | Score Manager Class | ✅ Done |
-| 9 | DUnitX Unit Test Project | ✅ Done (IDE setup required) |
+| P0 | Update CLAUDE.md | ✅ Done |
+| P1 | Create PLAN.md + PROGRESS.md | ✅ Done |
+| S1 | Server: project scaffolding | ✅ Done |
+| S2 | Server: models + SessionStore | ✅ Done |
+| S3 | Server: REST API | ✅ Done |
+| S4 | Server: SignalR hub | ✅ Done |
+| S5 | Server: HeartbeatMonitor | ⬜ Not started |
+| S6 | Server: web UI | ⬜ Not started |
+| S7 | Server: integration test | ⬜ Not started |
+| D1 | Delphi: ServerClient.pas | ⬜ Not started |
+| D2 | Delphi: MainFrm.fmx changes | ⬜ Not started |
+| D3 | Delphi: MainFrm.pas logic | ⬜ Not started |
+| D4 | Delphi: ZXing QR scanning | ⬜ Not started |
+| D5 | Delphi: end-to-end test | ⬜ Not started |
+| F1 | Update README.md | ⬜ Not started |
+| F2 | Final review + documentation | ⬜ Not started |
 
 ---
 
 ## Log
 
-### 2026-03-21
-- Read initial instructions from `claude/inital instructions.txt`
-- Created `PROJECT.md` with project description, requirements, and design spec
-- Created `PLAN.md` with 6-step execution plan
-- Created `PROGRESS.md` (this file)
-- **Awaiting developer approval of the plan before starting Step 1**
+### 2026-03-23 — S4
+- Implemented `Hubs/GameHub.cs`: injects `SessionStore` to validate session on group join
+- `JoinSessionGroup(sessionId)`: validates session exists, adds connection to SignalR group named by `sessionId`; throws `HubException` if session not found (returned to browser as an error)
+- `OnDisconnectedAsync`: overridden for clarity; ASP.NET Core removes connection from groups automatically on disconnect — no manual cleanup needed
+- **Action required:** Build in VS 2022; open browser console on a test page and confirm hub connects at `http://localhost:5000/gamehub`
 
-### 2026-03-21 — Step 1
-- Created `SlimsteMensTimer.dpr` (project source file)
-- Created `SlimsteMensTimer.dproj` (MSBuild project config, Android target, Debug+Release configs)
-- Created `Unit1.pas` (empty main form unit)
-- Created `Unit1.fmx` (FMX form with `FormFactor.Orientations = [Portrait]`)
-- **Action required:** Open `SlimsteMensTimer.dproj` in Delphi IDE, verify it builds without errors, and confirm portrait lock via Project > Options > Application > Orientation
+### 2026-03-23 — S3
+- Updated `IpAddressHelper` to inject `IConfiguration` and resolve port from `appsettings.json`; removed port parameter from `BuildJoinUrl`
+- Created `Models/Requests.cs`: `RegisterPlayerRequest`, `UpdateScoreRequest` records
+- Created `Controllers/SessionsController.cs`: POST/GET/start/DELETE for sessions; broadcasts `GameStarted`/`GameEnded` via SignalR
+- Created `Controllers/PlayersController.cs`: register player, list players, update score, heartbeat; broadcasts `PlayerJoined`, `ScoreUpdated`, `PlayerReturned`
+- Created `Controllers/QrController.cs`: generates QR code PNG via QRCoder encoding the `joinUrl`
+- `PlayerReturned` is broadcast when a stale player pushes a score or heartbeat
+- **Action required:** Build in VS 2022; open Swagger UI at `http://localhost:5000/swagger` and verify all endpoints are listed
 
-### 2026-03-23 — Step 9
-- Created `tests/TestScoreManager.pas` — 20 DUnitX tests covering Create, Reset, Increase, Decrease, SetScore including edge cases and exception tests
-- Created `tests/SlimsteMensTimerTests.dpr` — console runner entry point; references `src/ScoreManager.pas` via relative path
-- `.dproj` must be created in the Delphi IDE (see action items below)
-- **Action required (IDE):**
-  1. File > New > Other > Console Application, save as `tests/SlimsteMensTimerTests`
-  2. Replace the generated `.dpr` content with `SlimsteMensTimerTests.dpr` (already written)
-  3. Project > Add to Project: add `TestScoreManager.pas`
-  4. Project > Options > Building > Delphi Compiler > Search Path: add `..\src`
-  5. Ensure DUnitX is on the library path (Tools > Options > Language > Delphi > Library)
-  6. Set platform to Win32 or Win64, build and run
+### 2026-03-23 — S2
+- Created `Models/SessionState.cs` — enum: Lobby, Active, Ended
+- Created `Models/Player.cs` — Id, Name, Score (default 60), LastSeen, IsStale
+- Created `Models/Session.cs` — Id, State, Players (ConcurrentDictionary), CreatedAt, LastActivity
+- Implemented `Services/SessionStore.cs` — CreateSession (6-char code, unambiguous chars), GetSession, StartSession, EndSession, DeleteSession, AddPlayer (duplicate name check), UpdateScore, UpdateHeartbeat, GetPlayer
+- `AddPlayerResult` enum co-located in SessionStore.cs
+- **Action required:** Build project in VS 2022 to confirm no compile errors
 
-### 2026-03-23 — Step 8
-- Created `src/ScoreManager.pas` with `IScoreManager` interface and `TScoreManager` class
-- `TScoreManager` extends `TInterfacedObject`; constants `ScoreDefault=60`, `ScoreMin=0`, `ScoreMax=1000`
-- `SetScore` raises `EArgumentOutOfRangeException` for out-of-range values
-- `Increase` uncapped; `Decrease` clamps to 0
-- Updated `MainFrm.pas`: replaced `FScore: Integer` with `FScoreManager: IScoreManager`; all score operations now go through the interface
-- Removed `System.Math` from `MainFrm` uses (now only needed in `ScoreManager`)
-- Added `ScoreManager.pas` to project, compiled and tested on device — working correctly
+### 2026-03-23 — S1
+- Created `SlimsteMensTimerServer/SlimsteMensTimerServer.sln`
+- Created `SlimsteMensTimerServer.csproj` targeting net8.0; NuGet: QRCoder 1.6.0, Swashbuckle.AspNetCore 6.9.0
+- Created `Program.cs`: SignalR, CORS (all origins + credentials), static files, Swagger, `/join/{id}` redirect, LAN IP startup log
+- Created `appsettings.json`: listens on `0.0.0.0:5000`, `StaleSeconds=30`, `SessionTimeoutHours=2`
+- Created stubs: `Hubs/GameHub.cs`, `Services/SessionStore.cs`, `Services/HeartbeatMonitor.cs`
+- Created `Services/IpAddressHelper.cs` (fully implemented — resolves LAN IP)
+- Created `wwwroot/` folder
+- **Action required:** Open `SlimsteMensTimerServer.sln` in VS 2022, restore NuGet packages, build and run — confirm startup log shows LAN IP and Swagger UI loads at `http://localhost:5000/swagger`
 
-### 2026-03-23 — Step 5
-- Added `btnMenu` (TRectangle, orange, rounded) + `txtMenu` (TText "☰") to top-left of `MainFrm.fmx`
-- Added `pnlMenu` (TRectangle, semi-transparent black) with three TText menu items
-- Implemented `btnMenuClick`: toggles `pnlMenu.Visible`
-- Implemented `mnuResetClick`: resets score to 60, stops timer, hides menu
-- Implemented `mnuSetScoreClick`: uses `InputQuery`, validates 0–1000, applies score
-- Implemented `mnuExitClick`: calls `Application.Terminate`
-- **Action required:** Open in Delphi IDE, build, and test on device/emulator
-
-### 2026-03-21 — Step 2
-- Updated `MainFrm.fmx` with full UI layout:
-  - `rectBackground` (TRectangle, Align=Client, dark red #B71C1C)
-  - `lblScore` (TLabel, 120pt white text, centered, Y=120)
-  - `btnMinus20`, `btnStartStop`, `btnPlus20` (TCircle, orange #FFA726, Y=480, evenly spaced)
-  - TText children inside each circle for labels (-20, Start, +20)
-- Updated `MainFrm.pas`: added component declarations and empty OnClick stubs
+### 2026-03-23 — P0 + P1
+- Updated `CLAUDE.md` to reflect dual-component architecture (Android app + ASP.NET Core server)
+- Created `claude/PLAN.md` with full implementation plan (P0–F2)
+- Created `claude/PROGRESS.md` (this file)
