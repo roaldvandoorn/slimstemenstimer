@@ -21,7 +21,7 @@
 | D5 | Delphi: end-to-end test | ✅ Done |
 | F1 | App download QR on landing page | ✅ Done |
 | F2 | End Spel + Nieuw Spel flow on scoreboard | ✅ Done |
-| F3 | Update README.md | ⬜ Not started |
+| F3 | Update README.md | ✅ Done |
 | F4 | Final review + documentation | ⬜ Not started |
 | F5 | Project presentation | ⬜ Not started |
 
@@ -33,6 +33,12 @@
 - End-to-end test passed: browser creates session → player joins via manual URL → "Online" label appears → score changes appear on scoreboard in real time
 - QR scanning silently failed during testing because the server had an active VPN; `IpAddressHelper` selected the VPN interface (10.0.x.x) instead of the LAN interface (192.168.x.x), so the QR encoded an unreachable address. Manual entry of the LAN IP bypassed this. Fix: disable VPN on the server machine before starting the server.
 - Code is correct — no code changes required for D5
+
+### 2026-03-24 — F3
+- Rewrote `README.md` to cover both components: Android app + server
+- Added: server build/run instructions (`dotnet run` + VS 2022), network requirements (same LAN, HTTP, VPN caveat), how-to-play walkthrough, full REST API reference table, SignalR events table
+- Updated project structure to include new files (`ServerClient.pas`, `ScannerFrm.*`, server tree, `res/network_security_config.xml`)
+- Updated dependencies section (Delphi 13, ZXing.Delphi, .NET 8)
 
 ### 2026-03-23 — F2
 - `scoreboard.html`: added `.host-controls` div with "End Spel" (`btn-danger`) and "Nieuw Spel" (initially hidden) buttons
