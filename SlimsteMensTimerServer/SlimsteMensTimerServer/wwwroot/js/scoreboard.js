@@ -10,18 +10,49 @@
 
     // ── DOM refs ─────────────────────────────────────────────────────────────
 
-    const grid      = document.getElementById('scoreGrid');
-    const banner    = document.getElementById('banner');
-    const sessionEl = document.getElementById('sessionSubtitle');
+    const grid       = document.getElementById('scoreGrid');
+    const banner     = document.getElementById('banner');
+    const sessionEl  = document.getElementById('sessionSubtitle');
+    const btnEnd     = document.getElementById('btnEndGame');
+    const btnNew     = document.getElementById('btnNewGame');
 
     // ── Guard ────────────────────────────────────────────────────────────────
 
     if (!sessionId) {
         banner.textContent = 'Geen sessie opgegeven.';
         banner.style.display = 'block';
+        btnEnd.style.display = 'none';
     } else {
         sessionEl.textContent = `Sessie: ${sessionId}`;
         init();
+    }
+
+    // ── Host controls ────────────────────────────────────────────────────────
+
+    btnEnd.addEventListener('click', async () => {
+        btnEnd.disabled = true;
+        try {
+            const resp = await fetch(`/api/sessions/${sessionId}`, { method: 'DELETE' });
+            if (resp.ok) {
+                showGameEnded(); // update host UI immediately; other tabs get it via SignalR
+            } else {
+                btnEnd.disabled = false;
+            }
+        } catch (err) {
+            console.error('Failed to end session:', err);
+            btnEnd.disabled = false;
+        }
+    });
+
+    btnNew.addEventListener('click', () => {
+        window.location.href = '/lobby.html';
+    });
+
+    function showGameEnded() {
+        banner.innerHTML = 'Het spel is afgelopen. <a href="/lobby.html" class="banner-link">Nieuw Spel</a>';
+        banner.style.display = 'block';
+        btnEnd.style.display = 'none';
+        btnNew.style.display = 'inline-block';
     }
 
     // ── Init ─────────────────────────────────────────────────────────────────
@@ -92,8 +123,7 @@
         });
 
         connection.on('GameEnded', () => {
-            banner.textContent = 'Het spel is afgelopen.';
-            banner.style.display = 'block';
+            showGameEnded();
         });
 
         connection.start()

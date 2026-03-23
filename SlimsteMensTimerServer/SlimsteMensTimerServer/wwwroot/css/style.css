@@ -61,6 +61,28 @@ body {
 
 .landing p { font-size: 1.1rem; opacity: 0.8; }
 
+.app-download {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 1rem;
+  opacity: 0.75;
+}
+
+.app-qr {
+  width: 140px;
+  height: 140px;
+  border-radius: 10px;
+  background: #fff;
+}
+
+.app-download-label {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
 /* ── Lobby view ───────────────────────────────────────── */
 
 .lobby-layout {
@@ -162,6 +184,24 @@ body {
   word-break: break-word;
 }
 
+/* ── Host controls ────────────────────────────────────── */
+
+.host-controls {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 2.5rem;
+  width: 100%;
+}
+
+.btn-danger {
+  background-color: rgba(0, 0, 0, 0.35);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+.btn-danger:hover { background-color: rgba(0, 0, 0, 0.55); opacity: 1; }
+
 /* ── Banner ───────────────────────────────────────────── */
 
 .banner {
@@ -172,6 +212,15 @@ body {
   font-size: 1.05rem;
   margin-bottom: 1.5rem;
 }
+
+.banner-link {
+  color: var(--accent);
+  font-weight: bold;
+  text-decoration: none;
+  margin-left: 0.5rem;
+}
+
+.banner-link:hover { text-decoration: underline; }
 
 .session-subtitle {
   text-align: center;

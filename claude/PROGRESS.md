@@ -18,9 +18,9 @@
 | D2 | Delphi: MainFrm.fmx changes | ✅ Done |
 | D3 | Delphi: MainFrm.pas logic | ✅ Done |
 | D4 | Delphi: ZXing QR scanning | ✅ Done |
-| D5 | Delphi: end-to-end test | ⬜ Not started |
-| F1 | App download QR on landing page | ⬜ Not started |
-| F2 | End Spel + Nieuw Spel flow on scoreboard | ⬜ Not started |
+| D5 | Delphi: end-to-end test | ✅ Done |
+| F1 | App download QR on landing page | ✅ Done |
+| F2 | End Spel + Nieuw Spel flow on scoreboard | ✅ Done |
 | F3 | Update README.md | ⬜ Not started |
 | F4 | Final review + documentation | ⬜ Not started |
 | F5 | Project presentation | ⬜ Not started |
@@ -28,6 +28,33 @@
 ---
 
 ## Log
+
+### 2026-03-23 — D5
+- End-to-end test passed: browser creates session → player joins via manual URL → "Online" label appears → score changes appear on scoreboard in real time
+- QR scanning silently failed during testing because the server had an active VPN; `IpAddressHelper` selected the VPN interface (10.0.x.x) instead of the LAN interface (192.168.x.x), so the QR encoded an unreachable address. Manual entry of the LAN IP bypassed this. Fix: disable VPN on the server machine before starting the server.
+- Code is correct — no code changes required for D5
+
+### 2026-03-23 — F2
+- `scoreboard.html`: added `.host-controls` div with "End Spel" (`btn-danger`) and "Nieuw Spel" (initially hidden) buttons
+- `scoreboard.js`: wired "End Spel" to `DELETE /api/sessions/{id}`; added `showGameEnded()` — hides "End Spel", shows "Nieuw Spel", updates banner with a "Nieuw Spel" link; `GameEnded` SignalR event calls `showGameEnded()` so all open tabs react; "Nieuw Spel" navigates to `/lobby.html`
+- `style.css`: added `.host-controls`, `.btn-danger`, `.banner-link` styles
+
+### 2026-03-23 — F1
+- Added `GET /api/appqr` endpoint to `QrController` — generates a QR PNG encoding the static Google Play internal test URL; no session required
+- Refactored `QrController` to extract a `GeneratePng(content)` helper shared by both endpoints; changed route attribute style to explicit paths (removed class-level `[Route]` prefix)
+- `lobby.html`: added `.app-download` block below "Nieuwe Sessie" button — `<img src="/api/appqr">` + "Download de app" label; only present in the landing view, not the lobby or scoreboard views
+- `style.css`: added `.app-download`, `.app-qr`, `.app-download-label` styles — 140 px QR, white background, muted opacity, uppercase label
+
+### 2026-03-23 — D5 (bug fix v2)
+- Root cause: `TThread.Synchronize(nil, ...)` from a `TTask` pool thread is unreliable on Android — `nil` does not resolve to a real thread object so the callback can be silently skipped
+- `MainFrm.pas` `DoJoin`: replaced `TTask.Run` with `TThread.CreateAnonymousThread` + `T.FreeOnTerminate := True; T.Start`; changed `TThread.Synchronize(nil, ...)` to `TThread.Synchronize(TThread.CurrentThread, ...)` — CreateAnonymousThread creates a real TThread so CurrentThread is valid
+- `ServerClient.pas` `JoinSession`: removed the broad catch-all except — exceptions now propagate to the caller so `DoJoin` can capture and display the actual error message; added `SessId.Trim` after URL parse; non-201 responses now raise an exception with the status code and body
+- `DoJoin` now captures `E.ClassName + ': ' + E.Message` and shows it in the error dialog — this reveals whether the issue is a URL parse error, network failure, or server rejection
+
+### 2026-03-23 — D4 (additional manual fixes)
+- `AndroidManifest.template.xml`: added `INTERNET` and `ACCESS_NETWORK_STATE` permissions via Delphi project settings (`<%uses-permission%>` placeholder); added `android:networkSecurityConfig="@xml/network_security_config"` to the `<application>` element to allow plain HTTP traffic to the LAN server
+- Created `res/network_security_config.xml`: `<base-config cleartextTrafficPermitted="true">` — required because Android 9+ blocks HTTP by default; the server runs on HTTP (not HTTPS)
+- `MainFrm.fmx`: moved `btnMenu` down (Position.Y 10 → 25) to avoid overlap with Android status bar
 
 ### 2026-03-23 — D4
 - Added `CAMERA` permission + `uses-feature` to `AndroidManifest.template.xml`

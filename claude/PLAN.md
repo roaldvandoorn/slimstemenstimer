@@ -179,6 +179,9 @@ Create `claude/PLAN.md` and `claude/PROGRESS.md`.
 - Do NOT deactivate `TCameraComponent` inside `DoFormClose` — this hangs the ZXing camera component; `caFree` alone is sufficient
 - A minimal `ScannerFrm.fmx` stub IS required alongside the `.pas` file — `{$R *.fmx}` causes `EResNotFound` at runtime without it
 - Use a named `reference to procedure` type (`TOnResultProc`) for the scan callback instead of `TProc<string>` — avoids compiler overload resolution errors
+- Android 9+ blocks plain HTTP by default — add `res/network_security_config.xml` with `cleartextTrafficPermitted="true"` and reference it via `android:networkSecurityConfig` in the `<application>` element of the manifest
+- Add `INTERNET` and `ACCESS_NETWORK_STATE` permissions via Delphi project options (not hardcoded in manifest) so the app can reach the LAN server
+- Move the hamburger button down slightly (Y=25) to clear the Android status bar
 
 ✅ Check in before D5.
 

@@ -136,7 +136,9 @@ begin
     FConnected := False;
 end;
 
-// JoinSession — blocking; call from a background thread (TTask.Run).
+// JoinSession — blocking; call from a background thread.
+// Raises an exception on failure (URL parse error, network error, or non-201 response).
+// On success, FConnected is True and the heartbeat timer is scheduled on the main thread.
 procedure TServerClient.JoinSession(const AJoinUrl, APlayerName: string);
 const
   ContentTypeHeader: TNameValuePair = (Name: 'Content-Type'; Value: 'application/json');
@@ -149,7 +151,8 @@ var
   Json: TJSONObject;
   PlayerId: string;
 begin
-  ParseJoinUrl(AJoinUrl, BaseUrl, SessId);
+  ParseJoinUrl(AJoinUrl.Trim, BaseUrl, SessId);
+  SessId := SessId.Trim;
 
   Http := THTTPClient.Create;
   try
@@ -157,39 +160,36 @@ begin
       '{"playerName":"' + APlayerName.Replace('"', '\"') + '"}',
       TEncoding.UTF8);
     try
-      try
-        Resp     := Http.Post(
-          BaseUrl + '/api/sessions/' + SessId + '/players',
-          BodyStream, nil, [ContentTypeHeader]);
-        RespBody := Resp.ContentAsString(TEncoding.UTF8);
+      Resp     := Http.Post(
+        BaseUrl + '/api/sessions/' + SessId + '/players',
+        BodyStream, nil, [ContentTypeHeader]);
+      RespBody := Resp.ContentAsString(TEncoding.UTF8);
 
-        if Resp.StatusCode = 201 then
+      if Resp.StatusCode = 201 then
+      begin
+        Json := TJSONObject.ParseJSONValue(RespBody) as TJSONObject;
+        try
+          PlayerId := Json.GetValue<string>('playerId');
+        finally
+          Json.Free;
+        end;
+
+        FBaseUrl    := BaseUrl;
+        FSessionId  := SessId;
+        FPlayerId   := PlayerId;
+        FPlayerName := APlayerName;
+        RecordSuccess;
+
+        // Enable heartbeat timer on the main thread.
+        // Caller must be a real TThread (not TTask pool) for Synchronize to work.
+        TThread.Synchronize(TThread.CurrentThread, procedure
         begin
-          Json := TJSONObject.ParseJSONValue(RespBody) as TJSONObject;
-          try
-            PlayerId := Json.GetValue<string>('playerId');
-          finally
-            Json.Free;
-          end;
-
-          FBaseUrl    := BaseUrl;
-          FSessionId  := SessId;
-          FPlayerId   := PlayerId;
-          FPlayerName := APlayerName;
-          RecordSuccess;
-
-          // Enable heartbeat timer on the main thread
-          TThread.Queue(nil, procedure
-          begin
-            FHeartbeat.Enabled := True;
-          end);
-        end
-        else
-          RecordFailure;
-
-      except
-        RecordFailure;
-      end;
+          FHeartbeat.Enabled := True;
+        end);
+      end
+      else
+        raise Exception.CreateFmt(
+          'Server antwoordde %d: %s', [Resp.StatusCode, RespBody]);
     finally
       BodyStream.Free;
     end;

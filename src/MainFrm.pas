@@ -231,11 +231,24 @@ begin
 end;
 
 procedure TMainForm.DoJoin(const AJoinUrl, APlayerName: string);
+var
+  T: TThread;
 begin
-  TTask.Run(procedure
+  // TThread.CreateAnonymousThread gives a real TThread object, so
+  // TThread.Synchronize(TThread.CurrentThread, ...) works correctly on Android.
+  // TTask.Run pool threads do not support Synchronize(nil, ...) reliably.
+  T := TThread.CreateAnonymousThread(procedure
+  var
+    ErrMsg: string;
   begin
-    FServerClient.JoinSession(AJoinUrl, APlayerName);
-    TThread.Queue(nil, procedure
+    ErrMsg := '';
+    try
+      FServerClient.JoinSession(AJoinUrl, APlayerName);
+    except
+      on E: Exception do
+        ErrMsg := E.ClassName + ': ' + E.Message;
+    end;
+    TThread.Synchronize(TThread.CurrentThread, procedure
     begin
       if FServerClient.IsConnected then
       begin
@@ -246,10 +259,17 @@ begin
         lblStatus.Text       := 'Online';
       end
       else
+      begin
+        if ErrMsg = '' then
+          ErrMsg := 'onbekende fout';
+        lblStatus.Text := 'Fout';
         TDialogService.ShowMessage(
-          'Kan geen verbinding maken met de server.'#10'Controleer de URL en probeer opnieuw.');
+          'Verbinding mislukt:'#10 + ErrMsg);
+      end;
     end);
   end);
+  T.FreeOnTerminate := True;
+  T.Start;
 end;
 
 procedure TMainForm.mnuLeaveGameClick(Sender: TObject);

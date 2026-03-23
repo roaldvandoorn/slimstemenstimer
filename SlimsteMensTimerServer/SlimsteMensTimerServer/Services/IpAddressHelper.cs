@@ -17,15 +17,35 @@ public class IpAddressHelper
     }
 
     /// <summary>
-    /// Returns the first non-loopback IPv4 address, falling back to localhost.
+    /// Returns the best LAN IPv4 address, preferring 192.168.x.x over other
+    /// private ranges (10.x.x.x is also used by VPN tunnels, so it ranks lower).
+    /// Falls back to any non-loopback address, then localhost.
     /// </summary>
     public string GetLanIpAddress()
     {
         var host = Dns.GetHostEntry(Dns.GetHostName());
-        var address = host.AddressList
-            .FirstOrDefault(ip => ip.AddressFamily == AddressFamily.InterNetwork
-                               && !IPAddress.IsLoopback(ip));
-        return address?.ToString() ?? "localhost";
+        var candidates = host.AddressList
+            .Where(ip => ip.AddressFamily == AddressFamily.InterNetwork
+                      && !IPAddress.IsLoopback(ip))
+            .ToList();
+
+        // 192.168.x.x — typical home/office LAN
+        var preferred = candidates.FirstOrDefault(ip => ip.ToString().StartsWith("192.168."));
+        if (preferred != null) return preferred.ToString();
+
+        // 172.16–31.x.x — less common LAN range
+        var fallback172 = candidates.FirstOrDefault(ip =>
+        {
+            var bytes = ip.GetAddressBytes();
+            return bytes[0] == 172 && bytes[1] >= 16 && bytes[1] <= 31;
+        });
+        if (fallback172 != null) return fallback172.ToString();
+
+        // 10.x.x.x — last resort (may be VPN)
+        var fallback10 = candidates.FirstOrDefault(ip => ip.ToString().StartsWith("10."));
+        if (fallback10 != null) return fallback10.ToString();
+
+        return candidates.FirstOrDefault()?.ToString() ?? "localhost";
     }
 
     /// <summary>
