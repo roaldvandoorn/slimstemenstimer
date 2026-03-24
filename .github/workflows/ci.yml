@@ -67,7 +67,8 @@ jobs:
         run: |
           & "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" `
             "installer\SlimsteMensTimerServer.iss" `
-            /DMyAppVersion="${{ github.ref_name }}"
+            /DMyAppVersion="${{ github.ref_name }}" `
+            /O"installer"
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
