@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using SlimsteMensTimerServer.Hubs;
 using SlimsteMensTimerServer.Models;
 using SlimsteMensTimerServer.Services;
@@ -22,6 +23,10 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddSingleton<SessionStore>();
 builder.Services.AddSingleton<IpAddressHelper>();
 builder.Services.AddHostedService<HeartbeatMonitor>();
+builder.Services.AddSingleton(new StartupInfo(DateTimeOffset.UtcNow));
+
+// Health checks — exposed at /health
+builder.Services.AddHealthChecks();
 
 // CORS — allow all origins with credentials (required for SignalR WebSocket negotiation)
 builder.Services.AddCors(options =>
@@ -51,6 +56,7 @@ app.UseCors();
 
 app.MapControllers();
 app.MapHub<GameHub>("/gamehub");
+app.MapHealthChecks("/health");
 
 // /join/{sessionId} — deep-link target encoded in the QR code.
 // Redirects to scoreboard when session is Active, otherwise to lobby.

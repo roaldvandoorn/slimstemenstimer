@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>De Slimste Mens — Serverstatus</title>
+  <link rel="stylesheet" href="/css/style.css" />
+  <style>
+    .status-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 1.5rem;
+      margin-top: 2rem;
+    }
+
+    .stat-card {
+      background: var(--card-bg);
+      border-radius: 14px;
+      padding: 1.5rem 1rem;
+      text-align: center;
+    }
+
+    .stat-value {
+      font-size: 2.8rem;
+      font-weight: bold;
+      color: var(--accent);
+      line-height: 1;
+    }
+
+    .stat-label {
+      margin-top: 0.5rem;
+      font-size: 0.85rem;
+      opacity: 0.7;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: rgba(0, 0, 0, 0.25);
+      border-radius: 50px;
+      padding: 0.4rem 1rem;
+      font-size: 0.9rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #4caf50;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50%       { opacity: 0.4; }
+    }
+
+    .update-banner {
+      background: rgba(255, 167, 38, 0.2);
+      border: 1px solid var(--accent);
+      border-radius: 10px;
+      padding: 0.9rem 1.5rem;
+      text-align: center;
+      margin-top: 1.5rem;
+      font-size: 1rem;
+    }
+
+    .update-banner a {
+      color: var(--accent);
+      font-weight: bold;
+      text-decoration: none;
+      margin-left: 0.4rem;
+    }
+
+    .update-banner a:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+<div class="container">
+
+  <div class="title">Serverstatus</div>
+
+  <div style="text-align:center">
+    <div class="status-badge">
+      <span class="dot" id="statusDot"></span>
+      <span id="statusText">Verbinden…</span>
+    </div>
+  </div>
+
+  <div id="updateBanner" class="update-banner" style="display:none"></div>
+
+  <div class="status-grid">
+    <div class="stat-card">
+      <div class="stat-value" id="valVersion">—</div>
+      <div class="stat-label">Versie</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value" id="valUptime">—</div>
+      <div class="stat-label">Uptime</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value" id="valSessions">—</div>
+      <div class="stat-label">Actieve sessies</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value" id="valPlayers">—</div>
+      <div class="stat-label">Spelers verbonden</div>
+    </div>
+  </div>
+
+  <footer class="page-footer">
+    <a href="/lobby.html">← Lobby</a>
+  </footer>
+
+</div>
+<script>
+  const GITHUB_REPO = 'roaldvandoorn/slimstemenstimer';
+  const RELEASES_URL = `https://github.com/${GITHUB_REPO}/releases/latest`;
+
+  function formatUptime(seconds) {
+    const h = Math.floor(seconds / 3600);
+    const m = Math.floor((seconds % 3600) / 60);
+    const s = seconds % 60;
+    if (h > 0) return `${h}u ${m}m`;
+    if (m > 0) return `${m}m ${s}s`;
+    return `${s}s`;
+  }
+
+  function compareVersions(running, latest) {
+    // Strip leading 'v' for comparison
+    const strip = v => v.replace(/^v/, '');
+    return strip(running) !== strip(latest);
+  }
+
+  let updateChecked = false;
+
+  async function checkForUpdate(runningVersion) {
+    if (updateChecked) return;
+    updateChecked = true;
+    try {
+      const res = await fetch(`https://api.github.com/repos/${GITHUB_REPO}/releases/latest`, {
+        headers: { Accept: 'application/vnd.github+json' }
+      });
+      if (!res.ok) return;
+      const data = await res.json();
+      const latest = data.tag_name;
+      if (latest && compareVersions(runningVersion, latest)) {
+        const banner = document.getElementById('updateBanner');
+        banner.innerHTML =
+          `Nieuwe serverversie beschikbaar: <strong>${latest}</strong>` +
+          ` — <a href="${RELEASES_URL}" target="_blank" rel="noopener">download op GitHub</a>`;
+        banner.style.display = 'block';
+      }
+    } catch (_) {
+      // Network error or API unavailable — ignore silently
+    }
+  }
+
+  async function refresh() {
+    try {
+      const res = await fetch('/api/status');
+      if (!res.ok) throw new Error();
+      const d = await res.json();
+
+      document.getElementById('statusDot').style.background = '#4caf50';
+      document.getElementById('statusText').textContent = 'Online';
+      document.getElementById('valVersion').textContent = d.version;
+      document.getElementById('valUptime').textContent = formatUptime(d.uptimeSeconds);
+      document.getElementById('valSessions').textContent = d.activeSessions;
+      document.getElementById('valPlayers').textContent = d.totalPlayers;
+
+      checkForUpdate(d.version);
+    } catch (_) {
+      document.getElementById('statusDot').style.background = '#f44336';
+      document.getElementById('statusDot').style.animation = 'none';
+      document.getElementById('statusText').textContent = 'Offline';
+    }
+  }
+
+  refresh();
+  setInterval(refresh, 5000);
+</script>
+</body>
+</html>
