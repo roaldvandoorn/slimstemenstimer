@@ -58,7 +58,20 @@ jobs:
           Compress-Archive -Path publish/win-x64/* `
             -DestinationPath "SlimsteMensTimerServer-${{ github.ref_name }}-win-x64.zip"
 
+      - name: Install Inno Setup
+        shell: pwsh
+        run: choco install innosetup --no-progress -y
+
+      - name: Build installer
+        shell: pwsh
+        run: |
+          & "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" `
+            "installer\SlimsteMensTimerServer.iss" `
+            /DMyAppVersion="${{ github.ref_name }}"
+
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          files: SlimsteMensTimerServer-${{ github.ref_name }}-win-x64.zip
+          files: |
+            SlimsteMensTimerServer-${{ github.ref_name }}-win-x64.zip
+            installer/SlimsteMensTimerServer-${{ github.ref_name }}-Setup.exe

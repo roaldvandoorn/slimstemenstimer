@@ -2,13 +2,13 @@
 
 ## Phase 3 — Installer for the server
 
-**Status: In progress — Step 2 complete**
+**Status: Complete — all 3 steps done**
 
 | Step | Item | Status |
 |------|------|--------|
 | 1 | #12 GitHub Actions CI pipeline | Done |
 | 2 | #13 GitHub Releases + artefact upload | Done |
-| 3 | #11 Windows installer (Inno Setup) | Not started |
+| 3 | #11 Windows installer (Inno Setup) | Done |
 
 ---
 
@@ -24,3 +24,4 @@
 - 2026-03-24 — Phase 3 plan written, pending developer review.
 - 2026-03-24 — Step 1 done: created `.github/workflows/ci.yml` (build-and-test on ubuntu-latest, .NET 8, restore/build/test on push to main and PRs).
 - 2026-03-24 — Step 2 done: added `release` job to `ci.yml`; triggers on `v*.*.*` tags, publishes self-contained win-x64 single-file exe, zips it, and uploads to a GitHub Release via softprops/action-gh-release@v2.
+- 2026-03-24 — Step 3 done: created `installer/SlimsteMensTimerServer.iss` (Inno Setup script); installs to Program Files, registers Windows Service, opens firewall port 5000, creates Start Menu shortcut to lobby. CI extended to build the installer via Chocolatey + ISCC and attach Setup.exe to the GitHub Release alongside the zip.
