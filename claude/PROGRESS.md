@@ -1,6 +1,6 @@
 # Progress Log
 
-## Status: In Progress
+## Status: Complete ✅
 
 | Step | Description | Status |
 |------|-------------|--------|
@@ -23,7 +23,7 @@
 | F2 | End Spel + Nieuw Spel flow on scoreboard | ✅ Done |
 | F3 | Update README.md | ✅ Done |
 | F4 | Final review + documentation | ✅ Done |
-| F5 | Project presentation | ⬜ Not started |
+| F5 | Project presentation | ✅ Done |
 
 ---
 
@@ -33,6 +33,11 @@
 - End-to-end test passed: browser creates session → player joins via manual URL → "Online" label appears → score changes appear on scoreboard in real time
 - QR scanning silently failed during testing because the server had an active VPN; `IpAddressHelper` selected the VPN interface (10.0.x.x) instead of the LAN interface (192.168.x.x), so the QR encoded an unreachable address. Manual entry of the LAN IP bypassed this. Fix: disable VPN on the server machine before starting the server.
 - Code is correct — no code changes required for D5
+
+### 2026-03-24 — F5
+- Created `claude/presentation.md` — 15-slide Marp-compatible deck
+- Covers: introduction, original prompt verbatim, Phase 1 (Steps 1–9), Phase 2 (S1–S8, D1–D5), architecture diagram, key design decisions, notable bugs table, project stats
+- Multiplayer prompt reconstructed from `claude/archive/PROJECT.md` and plan context
 
 ### 2026-03-24 — F4
 - Reviewed all new source files; three minor comment/import fixes applied:

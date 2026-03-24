@@ -2,7 +2,9 @@
   "permissions": {
     "allow": [
       "Bash(cp:*)",
-      "Bash(where npm:*)"
+      "Bash(where npm:*)",
+      "Bash(npx --version)",
+      "Bash(python -c \"import pptx; print\\(pptx.__version__\\)\")"
     ]
   }
 }
