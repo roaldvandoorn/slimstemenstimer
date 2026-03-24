@@ -3,6 +3,7 @@ name: CI
 on:
   push:
     branches: [ main ]
+    tags: [ 'v*.*.*' ]
   pull_request:
     branches: [ main ]
 
@@ -26,3 +27,38 @@ jobs:
 
       - name: Test
         run: dotnet test SlimsteMensTimerServer/SlimsteMensTimerServer.sln --no-build -c Release
+
+  release:
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: build-and-test
+    runs-on: windows-latest
+
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET 8
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Publish (self-contained win-x64)
+        run: >
+          dotnet publish
+          SlimsteMensTimerServer/SlimsteMensTimerServer/SlimsteMensTimerServer.csproj
+          -c Release -r win-x64 --self-contained true
+          -p:PublishSingleFile=true
+          -o publish/win-x64
+
+      - name: Zip artefact
+        shell: pwsh
+        run: |
+          Compress-Archive -Path publish/win-x64/* `
+            -DestinationPath "SlimsteMensTimerServer-${{ github.ref_name }}-win-x64.zip"
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: SlimsteMensTimerServer-${{ github.ref_name }}-win-x64.zip
