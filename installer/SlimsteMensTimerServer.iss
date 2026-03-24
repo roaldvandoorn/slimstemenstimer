@@ -28,8 +28,34 @@ Source: "{#MyPublishDir}\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdi
 Source: "lobby.url"; DestDir: "{app}"; Flags: ignoreversion
 
 [Icons]
-Name: "{group}\Open Lobby"; Filename: "{app}\lobby.url"
+Name: "{group}\Open Lobby";    Filename: "{app}\lobby.url"
+Name: "{group}\Start Server";  Filename: "{sys}\sc.exe"; Parameters: "start {#MyAppServiceName}"; Comment: "Start the {#MyAppName} Windows service"
+Name: "{group}\Stop Server";   Filename: "{sys}\sc.exe"; Parameters: "stop {#MyAppServiceName}";  Comment: "Stop the {#MyAppName} Windows service"
 Name: "{group}\Uninstall {#MyAppName}"; Filename: "{uninstallexe}"
+
+[Code]
+{ Byte 21 (0-indexed) of a .lnk file header holds the shortcut flags.
+  Bit 5 (0x20) is the "Run as administrator" flag. Setting it makes
+  Windows show a UAC prompt when the shortcut is launched. }
+procedure SetRunAsAdmin(const LnkPath: string);
+var
+  Content: AnsiString;
+begin
+  if LoadStringFromFile(LnkPath, Content) then
+  begin
+    Content[22] := Chr(Ord(Content[22]) or $20);
+    SaveStringToFile(LnkPath, Content, False);
+  end;
+end;
+
+procedure CurStepChanged(CurStep: TSetupStep);
+begin
+  if CurStep = ssPostInstall then
+  begin
+    SetRunAsAdmin(ExpandConstant('{group}\Start Server.lnk'));
+    SetRunAsAdmin(ExpandConstant('{group}\Stop Server.lnk'));
+  end;
+end;
 
 [Run]
 ; Register Windows Service
