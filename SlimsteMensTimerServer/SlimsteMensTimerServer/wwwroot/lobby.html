@@ -49,9 +49,19 @@
     </div>
   </div>
 
+  <footer class="page-footer">
+    <a href="/status.html">Serverstatus</a>
+    <span id="footerVersion"></span>
+  </footer>
+
 </div>
 
 <script src="/js/signalr.min.js"></script>
 <script src="/js/lobby.js"></script>
+<script>
+  fetch('/api/status').then(r => r.ok ? r.json() : null).then(d => {
+    if (d) document.getElementById('footerVersion').textContent = ' · ' + d.version;
+  }).catch(() => {});
+</script>
 </body>
 </html>

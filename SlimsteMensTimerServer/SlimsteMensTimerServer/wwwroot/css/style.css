@@ -228,3 +228,19 @@ body {
   font-size: 0.9rem;
   margin-bottom: 1.5rem;
 }
+
+/* ── Footer ───────────────────────────────────────────── */
+
+.page-footer {
+  margin-top: 3rem;
+  text-align: center;
+  font-size: 0.8rem;
+  opacity: 0.45;
+}
+
+.page-footer a {
+  color: var(--text);
+  text-decoration: none;
+}
+
+.page-footer a:hover { opacity: 0.8; text-decoration: underline; }

@@ -50,6 +50,7 @@ jobs:
           SlimsteMensTimerServer/SlimsteMensTimerServer/SlimsteMensTimerServer.csproj
           -c Release -r win-x64 --self-contained true
           -p:PublishSingleFile=true
+          -p:InformationalVersion="${{ github.ref_name }}"
           -o publish/win-x64
 
       - name: Zip artefact

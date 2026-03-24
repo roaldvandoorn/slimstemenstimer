@@ -5,6 +5,8 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <RootNamespace>SlimsteMensTimerServer</RootNamespace>
+    <!-- Overridden at release build time via -p:InformationalVersion=vX.Y.Z -->
+    <InformationalVersion>dev</InformationalVersion>
   </PropertyGroup>
 
   <ItemGroup>
