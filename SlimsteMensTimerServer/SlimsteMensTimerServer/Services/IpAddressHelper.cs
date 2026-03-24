@@ -41,6 +41,10 @@ public class IpAddressHelper
         });
         if (fallback172 != null) return fallback172.ToString();
 
+        // 10.138.x.x — Public wifi 
+        var fallback10138 = candidates.FirstOrDefault(ip => ip.ToString().StartsWith("10.138"));
+        if (fallback10138 != null) return fallback10138.ToString();
+
         // 10.x.x.x — last resort (may be VPN)
         var fallback10 = candidates.FirstOrDefault(ip => ip.ToString().StartsWith("10."));
         if (fallback10 != null) return fallback10.ToString();
