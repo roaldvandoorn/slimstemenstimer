@@ -130,29 +130,37 @@ Publish a `Dockerfile` and optionally push to GitHub Container Registry (`ghcr.i
 
 ---
 
-### 17. 📋 One-page setup guide (PDF / README)
-Write a non-technical `SETUP.md` / `SETUP.pdf` explaining: (1) download & run the server installer, (2) install the Android app from Play Store, (3) scan the QR code to join. Include screenshots. This is the document you hand to a friend hosting a game night.
+### ✅ ~~17. 📋 One-page setup guide (PDF / README)~~ — **IMPLEMENTED**
+~~Write a non-technical `SETUP.md` / `SETUP.pdf` explaining: (1) download & run the server installer, (2) install the Android app from Play Store, (3) scan the QR code to join. Include screenshots. This is the document you hand to a friend hosting a game night.~~
+
+Implemented in Phase 4. `SETUP.md` in Dutch covers server install, app install, joining a session, in-game controls, and troubleshooting.
 
 **Effort:** Low | **Value:** High
 
 ---
 
-### 18. 🔢 In-app version display & update notification
-Show the current app version in the About/Settings screen and query the GitHub Releases API to notify the user if a newer version is available. The server can also warn if the connected client app version is mismatched.
+### ✅ ~~18. 🔢 In-app version display & update notification~~ — **IMPLEMENTED**
+~~Show the current app version in the About/Settings screen and query the GitHub Releases API to notify the user if a newer version is available. The server can also warn if the connected client app version is mismatched.~~
+
+Implemented in Phase 4 (server side). Running server version shown in lobby/scoreboard footers. `status.html` queries the GitHub Releases API and shows an update banner when a newer server release is available.
 
 **Effort:** Low–Medium | **Value:** Medium
 
 ---
 
-### 19. ⚙️ Server config via `appsettings.json` with documentation
-Replace any hardcoded settings (port, max players, game timeout) with clearly documented entries in `appsettings.json`. Bonus: a small admin web page on the server lets a non-developer change the port or player limit without editing JSON manually.
+### ✅ ~~19. ⚙️ Server config via `appsettings.json` with documentation~~ — **IMPLEMENTED**
+~~Replace any hardcoded settings (port, max players, game timeout) with clearly documented entries in `appsettings.json`. Bonus: a small admin web page on the server lets a non-developer change the port or player limit without editing JSON manually.~~
+
+Implemented in Phase 4. `MaxPlayersPerSession` added and enforced. All settings documented in `appsettings.example.json`.
 
 **Effort:** Low–Medium | **Value:** Medium
 
 ---
 
-### 20. 🩺 Server health-check endpoint & status page
-Add a `/health` endpoint (ASP.NET Core `AddHealthChecks`) and a simple HTML status page at `/status` showing uptime, connected players, and current game state. Makes it easy for the host to verify the server is running before game night — no command line needed.
+### ✅ ~~20. 🩺 Server health-check endpoint & status page~~ — **IMPLEMENTED**
+~~Add a `/health` endpoint (ASP.NET Core `AddHealthChecks`) and a simple HTML status page at `/status` showing uptime, connected players, and current game state. Makes it easy for the host to verify the server is running before game night — no command line needed.~~
+
+Implemented in Phase 4. `/health` returns 200 Healthy; `/api/status` returns JSON; `status.html` auto-refreshes every 5 s with online badge, uptime, session count, and player count.
 
 **Effort:** Low | **Value:** Medium
 
@@ -165,13 +173,13 @@ Add a `/health` endpoint (ASP.NET Core `AddHealthChecks`) and a simple HTML stat
 | ~~11~~ | ~~Windows installer for server~~ ✅ | Distribution | Low–Med | Very High |
 | ~~13~~ | ~~GitHub Releases + artefact upload~~ ✅ | DevOps | Low–Med | Very High |
 | 15 | Auto-deploy to Google Play | DevOps | Medium | Very High |
-| 17 | One-page setup guide | Documentation | Low | High |
+| ~~17~~ | ~~One-page setup guide~~ ✅ | Documentation | Low | High |
 | ~~12~~ | ~~GitHub Actions CI~~ ✅ | DevOps | Low | High |
 | 16 | Docker image for server | Distribution | Low–Med | High |
 | 14 | CD — auto-deploy to VPS/home server | DevOps | Medium | High |
-| 20 | Health-check endpoint & status page | Ease of use | Low | Medium |
-| 18 | In-app version display & update check | Ease of use | Low–Med | Medium |
-| 19 | Server config via appsettings UI | Ease of use | Low–Med | Medium |
+| ~~20~~ | ~~Health-check endpoint & status page~~ ✅ | Ease of use | Low | Medium |
+| ~~18~~ | ~~In-app version display & update check~~ ✅ | Ease of use | Low–Med | Medium |
+| ~~19~~ | ~~Server config via appsettings~~ ✅ | Ease of use | Low–Med | Medium |
 | 3  | Sound effects & audio feedback | Feature | Low–Med | High |
 | 7  | Configurable timer presets | Feature | Low | Medium |
 | 1  | Puzzle-card database & lookup | Feature | Medium | High |
@@ -205,14 +213,14 @@ The recommended sequence builds each step on the previous one, avoids rework, an
 | 5 | **#16 Docker image** | Alternative self-hosting path for Linux/NAS users; reuses the Release build from #13. |
 | 6 | **#14 CD — auto-deploy to VPS** | Optional if you run a permanent server; depends on #13 release artefact. |
 
-### Phase 3 — Discoverability & polish
+### Phase 3 — Discoverability & polish ✅ COMPLETE
 
 | Step | Item | Rationale |
 |------|------|-----------|
-| 7 | **#20 Health-check & status page** | Low effort; makes the running server self-explanatory before writing docs. |
-| 8 | **#19 Server config / appsettings** | Clean up any hardcoded values before documenting them. |
-| 9 | **#17 One-page setup guide** | Write this *after* the installer and Docker image exist so the guide reflects the real UX. |
-| 10 | **#18 In-app version & update check** | Ties together the GitHub Releases API from #13 with a user-visible notification. |
+| 7 ✅ | **#20 Health-check & status page** | Low effort; makes the running server self-explanatory before writing docs. |
+| 8 ✅ | **#19 Server config / appsettings** | Clean up any hardcoded values before documenting them. |
+| 9 ✅ | **#17 One-page setup guide** | Write this *after* the installer and Docker image exist so the guide reflects the real UX. |
+| 10 ✅ | **#18 In-app version & update check** | Ties together the GitHub Releases API from #13 with a user-visible notification. |
 
 ### Phase 4 — Feature improvements (game-night quality)
 
