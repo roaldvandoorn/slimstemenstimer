@@ -6,7 +6,9 @@
       "Bash(npx --version)",
       "Bash(python -c \"import pptx; print\\(pptx.__version__\\)\")",
       "Bash(pip install:*)",
-      "Bash(python:*)"
+      "Bash(python:*)",
+      "Bash(mkdir -p P:/slimstemenstimer/claude/memories)",
+      "Bash(cp C:/Users/rtvdo/.claude/projects/P--slimstemenstimer/memory/* P:/slimstemenstimer/claude/memories/)"
     ]
   }
 }
