@@ -1,7 +1,9 @@
 #define MyAppName      "Slimste Mens Timer Server"
 #define MyAppExeName   "SlimsteMensTimerServer.exe"
 #define MyAppServiceName "SlimsteMensTimerSvc"
-#define MyAppVersion   "1.0.0"   ; overridden at compile time: /DMyAppVersion=v1.2.3
+#ifndef MyAppVersion
+  #define MyAppVersion "0.0.0"   ; override at compile time: /DMyAppVersion=v1.2.3
+#endif
 #define MyPublishDir   SourcePath + "\..\publish\win-x64"
 
 [Setup]
