@@ -4,6 +4,9 @@ using SlimsteMensTimerServer.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Enables Windows Service lifecycle (signals SCM, sets content root to exe directory)
+builder.Host.UseWindowsService();
+
 // ── Services ────────────────────────────────────────────────────────────────
 
 builder.Services.AddControllers();

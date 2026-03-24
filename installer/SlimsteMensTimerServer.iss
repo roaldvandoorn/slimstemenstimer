@@ -25,6 +25,7 @@ Name: "english"; MessagesFile: "compiler:Default.isl"
 
 [Files]
 Source: "{#MyPublishDir}\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "lobby.url"; DestDir: "{app}"; Flags: ignoreversion
 
 [Icons]
 Name: "{group}\Open Lobby"; Filename: "{app}\lobby.url"
@@ -45,21 +46,3 @@ Filename: "sc.exe"; Parameters: "delete {#MyAppServiceName}"; Flags: runhidden w
 ; Remove firewall rule
 Filename: "netsh.exe"; Parameters: "advfirewall firewall delete rule name=""{#MyAppName}"""; Flags: runhidden waituntilterminated
 
-[Code]
-{ Create lobby.url internet shortcut so the Start Menu entry opens the browser }
-procedure CurStepChanged(CurStep: TSetupStep);
-var
-  Lines: TStringList;
-begin
-  if CurStep = ssPostInstall then
-  begin
-    Lines := TStringList.Create;
-    try
-      Lines.Add('[InternetShortcut]');
-      Lines.Add('URL=http://localhost:5000/lobby.html');
-      Lines.SaveToFile(ExpandConstant('{app}\lobby.url'));
-    finally
-      Lines.Free;
-    end;
-  end;
-end;
