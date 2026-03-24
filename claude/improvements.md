@@ -82,22 +82,28 @@ After a game, export the result summary (scores, timeline, winner) as a shareabl
 
 ## Section B — Distribution, DevOps & Ease-of-Use Improvements
 
-### 11. 📦 Windows installer for the server (Inno Setup)
-Package the ASP.NET Core server as a Windows installer (`SlimsteMensTimerServer-Setup.exe`) using Inno Setup. The installer registers it as a Windows Service (auto-start on boot), opens firewall port 5000, and adds an uninstaller. A non-developer can set up the host PC in two clicks.
+### 11. ✅ ~~📦 Windows installer for the server (Inno Setup)~~ — **IMPLEMENTED**
+~~Package the ASP.NET Core server as a Windows installer (`SlimsteMensTimerServer-Setup.exe`) using Inno Setup. The installer registers it as a Windows Service (auto-start on boot), opens firewall port 5000, and adds an uninstaller. A non-developer can set up the host PC in two clicks.~~
+
+Implemented in Phase 3. Installer registers `SlimsteMensTimerSvc`, opens port 5000, creates Start Menu shortcuts (Open Lobby, Start Server, Stop Server, Uninstall). Attached to every GitHub Release.
 
 **Effort:** Low–Medium | **Value:** Very High
 
 ---
 
-### 12. 🚀 GitHub Actions CI — build & test on every push
-Add a `.github/workflows/ci.yml` pipeline that builds the ASP.NET Core server, runs the server-side tests, and reports pass/fail on every push and pull request. Keeps the `main` branch always green and gives confidence before releasing.
+### 12. ✅ ~~🚀 GitHub Actions CI — build & test on every push~~ — **IMPLEMENTED**
+~~Add a `.github/workflows/ci.yml` pipeline that builds the ASP.NET Core server, runs the server-side tests, and reports pass/fail on every push and pull request.~~
+
+Implemented in Phase 3. `.github/workflows/ci.yml` runs restore/build/test on every push to `main` and every PR.
 
 **Effort:** Low | **Value:** High
 
 ---
 
-### 13. 🏷️ GitHub Releases with automated artefact upload
-Extend the CI pipeline: when a Git tag like `v1.2.0` is pushed, automatically build the server in Release mode, zip the output, and attach it to a GitHub Release. Non-developers can download the latest server from the Releases page without needing Visual Studio.
+### 13. ✅ ~~🏷️ GitHub Releases with automated artefact upload~~ — **IMPLEMENTED**
+~~Extend the CI pipeline: when a Git tag like `v1.2.0` is pushed, automatically build the server in Release mode, zip the output, and attach it to a GitHub Release.~~
+
+Implemented in Phase 3. Tag push triggers release job: publishes self-contained win-x64 exe, creates zip and Setup.exe, both attached to GitHub Release.
 
 **Effort:** Low–Medium | **Value:** Very High
 
@@ -156,11 +162,11 @@ Add a `/health` endpoint (ASP.NET Core `AddHealthChecks`) and a simple HTML stat
 
 | # | Improvement | Category | Effort | Value |
 |---|-------------|----------|--------|-------|
-| 11 | Windows installer for server | Distribution | Low–Med | Very High |
-| 13 | GitHub Releases + artefact upload | DevOps | Low–Med | Very High |
+| ~~11~~ | ~~Windows installer for server~~ ✅ | Distribution | Low–Med | Very High |
+| ~~13~~ | ~~GitHub Releases + artefact upload~~ ✅ | DevOps | Low–Med | Very High |
 | 15 | Auto-deploy to Google Play | DevOps | Medium | Very High |
 | 17 | One-page setup guide | Documentation | Low | High |
-| 12 | GitHub Actions CI | DevOps | Low | High |
+| ~~12~~ | ~~GitHub Actions CI~~ ✅ | DevOps | Low | High |
 | 16 | Docker image for server | Distribution | Low–Med | High |
 | 14 | CD — auto-deploy to VPS/home server | DevOps | Medium | High |
 | 20 | Health-check endpoint & status page | Ease of use | Low | Medium |
@@ -183,19 +189,19 @@ Add a `/health` endpoint (ASP.NET Core `AddHealthChecks`) and a simple HTML stat
 
 The recommended sequence builds each step on the previous one, avoids rework, and delivers value to non-developers as early as possible.
 
-### Phase 1 — CI/CD foundation (do these first, in order)
+### Phase 1 — CI/CD foundation ✅ COMPLETE
 
 | Step | Item | Rationale |
 |------|------|-----------|
-| 1 | **#12 GitHub Actions CI** | Foundation for everything else; validate the build is reproducible before automating releases. |
-| 2 | **#13 GitHub Releases + artefact upload** | Depends on CI. Once the pipeline exists, adding a release job on tag push is a small delta. |
+| 1 ✅ | **#12 GitHub Actions CI** | Foundation for everything else; validate the build is reproducible before automating releases. |
+| 2 ✅ | **#13 GitHub Releases + artefact upload** | Depends on CI. Once the pipeline exists, adding a release job on tag push is a small delta. |
 | 3 | **#15 Automated Google Play deployment** | Depends on #13 (shared tag-based trigger). Closes the Android distribution loop. |
 
-### Phase 2 — Server distribution (non-developers can self-host)
+### Phase 2 — Server distribution ✅ COMPLETE (core items)
 
 | Step | Item | Rationale |
 |------|------|-----------|
-| 4 | **#11 Windows installer (Inno Setup)** | Makes the GitHub Release artefact from #13 truly one-click for Windows hosts. |
+| 4 ✅ | **#11 Windows installer (Inno Setup)** | Makes the GitHub Release artefact from #13 truly one-click for Windows hosts. |
 | 5 | **#16 Docker image** | Alternative self-hosting path for Linux/NAS users; reuses the Release build from #13. |
 | 6 | **#14 CD — auto-deploy to VPS** | Optional if you run a permanent server; depends on #13 release artefact. |
 

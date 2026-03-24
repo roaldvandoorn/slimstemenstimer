@@ -47,16 +47,22 @@ tests/
 SlimsteMensTimerServer/
   SlimsteMensTimerServer.sln
   SlimsteMensTimerServer/
-    Program.cs                  ← DI, SignalR, CORS, static files
+    Program.cs                  ← DI, SignalR, CORS, static files; UseWindowsService() for service hosting
     Controllers/                ← REST API (sessions, players, QR code)
     Hubs/GameHub.cs             ← SignalR hub
     Models/                     ← Session, Player, SessionState
     Services/                   ← SessionStore, HeartbeatMonitor, IpAddressHelper
     wwwroot/                    ← lobby.html, scoreboard.html, JS, CSS
+installer/
+  SlimsteMensTimerServer.iss    ← Inno Setup script; compiled in CI on tag push
+  lobby.url                     ← Internet Shortcut bundled into installer (Start Menu)
+.github/workflows/
+  ci.yml                        ← build-and-test on every push/PR; release job on v*.*.* tags
 claude/
-  PLAN.md                       ← step-by-step execution plan
-  PROGRESS.md                   ← progress log
-  archive/                      ← completed project documentation
+  PLAN.md                       ← step-by-step execution plan (current phase)
+  PROGRESS.md                   ← progress log (current phase)
+  improvements.md               ← backlog of improvements with priority matrix
+  archive/                      ← completed phase plans and progress logs
 ```
 
 ## Build & Deploy
@@ -77,6 +83,13 @@ claude/
 - Run with F5 (IIS Express) or `dotnet run` in the project folder
 - Listens on `http://0.0.0.0:5000` by default
 - Server and Android devices must be on the same local network
+- `UseWindowsService()` is active but is a no-op outside the SCM; normal dev/debug runs are unaffected
+
+### Release / installer (GitHub Actions)
+- Push a `v*.*.*` tag to trigger the release pipeline
+- CI builds a self-contained win-x64 single-file exe, creates a portable zip and an Inno Setup installer
+- Both artefacts are attached to the GitHub Release automatically
+- Inno Setup script: `installer/SlimsteMensTimerServer.iss`; version passed via `/DMyAppVersion` using `#ifndef` guard
 
 ## Android App Architecture
 

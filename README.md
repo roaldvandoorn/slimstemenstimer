@@ -58,6 +58,19 @@ claude/
   PROGRESS.md                   ← progress log
 ```
 
+## Download (pre-built releases)
+
+The latest server release is available on the [GitHub Releases page](../../releases/latest). Each release includes:
+
+| File | Use |
+|------|-----|
+| `SlimsteMensTimerServer-vX.X.X-Setup.exe` | **Recommended.** One-click Windows installer — registers the server as a Windows Service (auto-start on boot), opens firewall port 5000, and adds Start Menu shortcuts to open the lobby and start/stop the service. |
+| `SlimsteMensTimerServer-vX.X.X-win-x64.zip` | Portable zip — extract and run `SlimsteMensTimerServer.exe` directly. No installation required. |
+
+No .NET runtime installation is needed — both artefacts are self-contained.
+
+---
+
 ## Building and running
 
 ### Android app
