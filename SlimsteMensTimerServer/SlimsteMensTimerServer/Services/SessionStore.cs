@@ -1,4 +1,5 @@
 using System.Collections.Concurrent;
+using Microsoft.Extensions.Configuration;
 using SlimsteMensTimerServer.Models;
 
 namespace SlimsteMensTimerServer.Services;
@@ -8,7 +9,8 @@ public enum AddPlayerResult
     Success,
     SessionNotFound,
     SessionEnded,
-    NameTaken
+    NameTaken,
+    SessionFull
 }
 
 /// <summary>
@@ -20,10 +22,16 @@ public enum AddPlayerResult
 public class SessionStore
 {
     private readonly ConcurrentDictionary<string, Session> _sessions = new();
+    private readonly int _maxPlayersPerSession;
 
     // Session codes use unambiguous characters only (no 0/O, 1/I)
     private const string CodeChars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
     private const int CodeLength = 6;
+
+    public SessionStore(IConfiguration config)
+    {
+        _maxPlayersPerSession = config.GetValue<int>("GameSettings:MaxPlayersPerSession", 8);
+    }
 
     // ── Sessions ─────────────────────────────────────────────────────────────
 
@@ -75,6 +83,8 @@ public class SessionStore
             return (null, AddPlayerResult.SessionNotFound);
         if (session.State == SessionState.Ended)
             return (null, AddPlayerResult.SessionEnded);
+        if (session.Players.Count >= _maxPlayersPerSession)
+            return (null, AddPlayerResult.SessionFull);
         if (session.Players.Values.Any(p =>
                 string.Equals(p.Name, playerName, StringComparison.OrdinalIgnoreCase)))
             return (null, AddPlayerResult.NameTaken);

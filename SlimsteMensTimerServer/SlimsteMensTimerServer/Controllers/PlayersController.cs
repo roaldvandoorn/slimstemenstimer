@@ -32,6 +32,8 @@ public class PlayersController : ControllerBase
                 return UnprocessableEntity(new { error = "Session has ended." });
             case AddPlayerResult.NameTaken:
                 return Conflict(new { error = $"Name '{request.PlayerName}' is already taken in this session." });
+            case AddPlayerResult.SessionFull:
+                return Conflict(new { error = "This session is full." });
         }
 
         await _hub.Clients.Group(sessionId).SendAsync("PlayerJoined", player!.Id, player.Name, player.Score);
