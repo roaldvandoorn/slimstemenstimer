@@ -25,15 +25,30 @@ Name: "english"; MessagesFile: "compiler:Default.isl"
 
 [Files]
 Source: "{#MyPublishDir}\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
-Source: "lobby.url"; DestDir: "{app}"; Flags: ignoreversion
+Source: "lobby.url";   DestDir: "{app}"; Flags: ignoreversion
+Source: "start.ico";   DestDir: "{app}"; Flags: ignoreversion
+Source: "stop.ico";    DestDir: "{app}"; Flags: ignoreversion
 
 [Icons]
-Name: "{group}\Open Lobby";    Filename: "{app}\lobby.url"
-Name: "{group}\Start Server";  Filename: "{sys}\sc.exe"; Parameters: "start {#MyAppServiceName}"; Comment: "Start the {#MyAppName} Windows service"
-Name: "{group}\Stop Server";   Filename: "{sys}\sc.exe"; Parameters: "stop {#MyAppServiceName}";  Comment: "Stop the {#MyAppName} Windows service"
+Name: "{group}\Open Lobby";    Filename: "{app}\lobby.url"; IconFilename: "{app}\{#MyAppExeName}"
+Name: "{group}\Start Server";  Filename: "{sys}\sc.exe"; Parameters: "start {#MyAppServiceName}"; Comment: "Start the {#MyAppName} Windows service"; IconFilename: "{app}\start.ico"
+Name: "{group}\Stop Server";   Filename: "{sys}\sc.exe"; Parameters: "stop {#MyAppServiceName}";  Comment: "Stop the {#MyAppName} Windows service"; IconFilename: "{app}\stop.ico"
 Name: "{group}\Uninstall {#MyAppName}"; Filename: "{uninstallexe}"
 
 [Code]
+{ Stop the service before files are extracted so the exe is not locked during overwrite.
+  On a first install the service does not exist yet; sc.exe returns a non-zero exit code
+  which we intentionally ignore. }
+function PrepareToInstall(var NeedsRestart: Boolean): String;
+var
+  ResultCode: Integer;
+begin
+  Exec(ExpandConstant('{sys}\sc.exe'), 'stop {#MyAppServiceName}', '',
+       SW_HIDE, ewWaitUntilTerminated, ResultCode);
+  Sleep(2000); // Allow the process time to exit before files are overwritten
+  Result := '';
+end;
+
 { Byte 21 (0-indexed) of a .lnk file header holds the shortcut flags.
   Bit 5 (0x20) is the "Run as administrator" flag. Setting it makes
   Windows show a UAC prompt when the shortcut is launched. }
