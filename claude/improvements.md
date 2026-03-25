@@ -109,10 +109,12 @@ Implemented in Phase 3. Tag push triggers release job: publishes self-contained 
 
 ---
 
-### 14. 🤖 GitHub Actions CD — auto-deploy server to a VPS / home server
-Add a deploy step that SSH's into a designated host (e.g. a Raspberry Pi or cheap VPS) and restarts the server service when a release tag is pushed. Eliminates manual copy/paste deployments entirely.
+### ~~14. 🤖 GitHub Actions CD — auto-deploy server to a VPS / home server~~ — **DESCOPED**
+~~Add a deploy step that SSH's into a designated host (e.g. a Raspberry Pi or cheap VPS) and restarts the server service when a release tag is pushed.~~
 
-**Effort:** Medium | **Value:** High
+Not relevant for the target audience (board game users, not developers). The Windows installer already covers the primary self-hosting use case.
+
+**Effort:** Medium | **Value:** n/a (developer tooling, not end-user value)
 
 ---
 
@@ -123,10 +125,12 @@ Use the `r0adkll/upload-google-play` GitHub Action to push a signed `.aab` to th
 
 ---
 
-### 16. 🐳 Docker image for the server
-Publish a `Dockerfile` and optionally push to GitHub Container Registry (`ghcr.io`). Anyone with Docker Desktop can run the server with a single command — zero .NET installation required. Ideal for Linux home servers or NAS devices (Synology, QNAP).
+### ~~16. 🐳 Docker image for the server~~ — **DESCOPED**
+~~Publish a `Dockerfile` and optionally push to GitHub Container Registry (`ghcr.io`).~~
 
-**Effort:** Low–Medium | **Value:** High
+Not relevant for the target audience. The product is a board game companion app; Docker adds no value for non-technical users. The Windows installer already covers the self-hosting use case.
+
+**Effort:** Low–Medium | **Value:** n/a (developer tooling, not end-user value)
 
 ---
 
@@ -175,8 +179,8 @@ Implemented in Phase 4. `/health` returns 200 Healthy; `/api/status` returns JSO
 | 15 | Auto-deploy to Google Play | DevOps | Medium | Very High |
 | ~~17~~ | ~~One-page setup guide~~ ✅ | Documentation | Low | High |
 | ~~12~~ | ~~GitHub Actions CI~~ ✅ | DevOps | Low | High |
-| 16 | Docker image for server | Distribution | Low–Med | High |
-| 14 | CD — auto-deploy to VPS/home server | DevOps | Medium | High |
+| ~~16~~ | ~~Docker image for server~~ ❌ descoped | Distribution | — | — |
+| ~~14~~ | ~~CD — auto-deploy to VPS/home server~~ ❌ descoped | DevOps | — | — |
 | ~~20~~ | ~~Health-check endpoint & status page~~ ✅ | Ease of use | Low | Medium |
 | ~~18~~ | ~~In-app version display & update check~~ ✅ | Ease of use | Low–Med | Medium |
 | ~~19~~ | ~~Server config via appsettings~~ ✅ | Ease of use | Low–Med | Medium |
@@ -210,8 +214,8 @@ The recommended sequence builds each step on the previous one, avoids rework, an
 | Step | Item | Rationale |
 |------|------|-----------|
 | 4 ✅ | **#11 Windows installer (Inno Setup)** | Makes the GitHub Release artefact from #13 truly one-click for Windows hosts. |
-| 5 | **#16 Docker image** | Alternative self-hosting path for Linux/NAS users; reuses the Release build from #13. |
-| 6 | **#14 CD — auto-deploy to VPS** | Optional if you run a permanent server; depends on #13 release artefact. |
+| ~~5~~ | ~~**#16 Docker image**~~ | Descoped — developer tooling, no value for board game users. |
+| ~~6~~ | ~~**#14 CD — auto-deploy to VPS**~~ | Descoped — developer tooling, no value for board game users. |
 
 ### Phase 3 — Discoverability & polish ✅ COMPLETE
 
