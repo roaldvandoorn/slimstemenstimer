@@ -13,3 +13,4 @@ _No active phase. Choose the next phase from `improvements.md` and record the pl
 | Phase 3 | CI pipeline, GitHub Releases, Windows installer (Inno Setup) | `archive/PLAN_phase3_installer.md` |
 | Phase 4 | Discoverability & polish (#17 #18 #19 #20) | `archive/PLAN_phase4_discoverability.md` |
 | Phase 5 | Google Play deployment + installer improvements (#15 + icons/stop-service) | `archive/PLAN_phase5_google_play.md` |
+| Phase 6 | Browser-based player client (#22) | `archive/PLAN_phase6_browser_player.md` |

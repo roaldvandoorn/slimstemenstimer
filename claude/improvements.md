@@ -174,8 +174,10 @@ Register the developer's Windows machine as a GitHub Actions self-hosted runner.
 
 ---
 
-### 22. 🌐 Browser-based player client
-When a player opens the join URL in a browser instead of the Android app, redirect to a new `player.html` page. The player enters their name, joins the session, and gets a mobile-friendly scoring UI that mirrors the Android app: countdown timer (Start/Stop), +20 / −20 buttons, score synced to the server in real time via the existing REST API. Heartbeat keeps the player alive in the session. Useful for players who cannot or prefer not to install the Android app.
+### ✅ ~~22. 🌐 Browser-based player client~~ — **IMPLEMENTED**
+~~When a player opens the join URL in a browser instead of the Android app, redirect to a new `player.html` page. The player enters their name, joins the session, and gets a mobile-friendly scoring UI that mirrors the Android app: countdown timer (Start/Stop), +20 / −20 buttons, score synced to the server in real time via the existing REST API. Heartbeat keeps the player alive in the session. Useful for players who cannot or prefer not to install the Android app.~~
+
+Implemented in Phase 6. `player.html` + `player.js`: join/waiting/game views, 1 pt/s countdown timer, +20/−20/reset, live other-players sidebar via SignalR. `/join/{id}` redirects to player.html. No server API changes needed.
 
 **Effort:** Medium | **Value:** High
 
@@ -205,7 +207,7 @@ Implemented in Phase 4. `/health` returns 200 Healthy; `/api/status` returns JSO
 | ~~18~~ | ~~In-app version display & update check~~ ✅ | Ease of use | Low–Med | Medium |
 | ~~19~~ | ~~Server config via appsettings~~ ✅ | Ease of use | Low–Med | Medium |
 | 21 | Self-hosted runner — automated Android build | DevOps | Low | Medium |
-| 22 | Browser-based player client | Feature | Medium | High |
+| ~~22~~ | ~~Browser-based player client~~ ✅ | Feature | Medium | High |
 | 3  | Sound effects & audio feedback | Feature | Low–Med | High |
 | 7  | Configurable timer presets | Feature | Low | Medium |
 | 1  | Puzzle-card database & lookup | Feature | Medium | High |
