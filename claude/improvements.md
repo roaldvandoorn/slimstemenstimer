@@ -118,8 +118,10 @@ Not relevant for the target audience (board game users, not developers). The Win
 
 ---
 
-### 15. 📲 GitHub Actions — automated Google Play deployment
-Use the `r0adkll/upload-google-play` GitHub Action to push a signed `.aab` to the Google Play internal test track automatically when a release tag is created. Requires storing the signing keystore and Play API JSON key as GitHub Secrets.
+### ✅ ~~15. 📲 GitHub Actions — automated Google Play deployment~~ — **IMPLEMENTED**
+~~Use the `r0adkll/upload-google-play` GitHub Action to push a signed `.aab` to the Google Play internal test track automatically when a release tag is created.~~
+
+Implemented in Phase 5. `.github/workflows/deploy-android.yml` — `workflow_dispatch` trigger with tag input. Developer builds and signs the AAB locally in Delphi, attaches it to the GitHub Release via `gh release upload`, then triggers the workflow to upload to the Play Store internal track. Requires `PLAY_STORE_JSON_KEY` secret. Full setup instructions in `RELEASING.md`.
 
 **Effort:** Medium | **Value:** Very High
 
@@ -161,6 +163,17 @@ Implemented in Phase 4. `MaxPlayersPerSession` added and enforced. All settings 
 
 ---
 
+### 21. 🤖 Self-hosted runner — automated Android AAB build in CI
+Register the developer's Windows machine as a GitHub Actions self-hosted runner. Because Delphi 13.1 is already installed on that machine, MSBuild can build the Android AAB automatically when a tag is pushed — no manual build step required. The existing `deploy-android.yml` upload workflow (item #15) would be extended with a build job that runs on the self-hosted runner.
+
+**Pre-requisites:** item #15 (deploy-android workflow) must be in place first. One-time setup: ~15 minutes to register the runner via GitHub repo Settings → Actions → Runners.
+
+**Trade-off:** the developer's machine must be running at the time of a tag push. Acceptable for a deliberate, manual release process.
+
+**Effort:** Low | **Value:** Medium
+
+---
+
 ### ✅ ~~20. 🩺 Server health-check endpoint & status page~~ — **IMPLEMENTED**
 ~~Add a `/health` endpoint (ASP.NET Core `AddHealthChecks`) and a simple HTML status page at `/status` showing uptime, connected players, and current game state. Makes it easy for the host to verify the server is running before game night — no command line needed.~~
 
@@ -176,7 +189,7 @@ Implemented in Phase 4. `/health` returns 200 Healthy; `/api/status` returns JSO
 |---|-------------|----------|--------|-------|
 | ~~11~~ | ~~Windows installer for server~~ ✅ | Distribution | Low–Med | Very High |
 | ~~13~~ | ~~GitHub Releases + artefact upload~~ ✅ | DevOps | Low–Med | Very High |
-| 15 | Auto-deploy to Google Play | DevOps | Medium | Very High |
+| ~~15~~ | ~~Auto-deploy to Google Play~~ ✅ | DevOps | Medium | Very High |
 | ~~17~~ | ~~One-page setup guide~~ ✅ | Documentation | Low | High |
 | ~~12~~ | ~~GitHub Actions CI~~ ✅ | DevOps | Low | High |
 | ~~16~~ | ~~Docker image for server~~ ❌ descoped | Distribution | — | — |
@@ -184,6 +197,7 @@ Implemented in Phase 4. `/health` returns 200 Healthy; `/api/status` returns JSO
 | ~~20~~ | ~~Health-check endpoint & status page~~ ✅ | Ease of use | Low | Medium |
 | ~~18~~ | ~~In-app version display & update check~~ ✅ | Ease of use | Low–Med | Medium |
 | ~~19~~ | ~~Server config via appsettings~~ ✅ | Ease of use | Low–Med | Medium |
+| 21 | Self-hosted runner — automated Android build | DevOps | Low | Medium |
 | 3  | Sound effects & audio feedback | Feature | Low–Med | High |
 | 7  | Configurable timer presets | Feature | Low | Medium |
 | 1  | Puzzle-card database & lookup | Feature | Medium | High |
@@ -207,7 +221,7 @@ The recommended sequence builds each step on the previous one, avoids rework, an
 |------|------|-----------|
 | 1 ✅ | **#12 GitHub Actions CI** | Foundation for everything else; validate the build is reproducible before automating releases. |
 | 2 ✅ | **#13 GitHub Releases + artefact upload** | Depends on CI. Once the pipeline exists, adding a release job on tag push is a small delta. |
-| 3 | **#15 Automated Google Play deployment** | Depends on #13 (shared tag-based trigger). Closes the Android distribution loop. |
+| 3 | **#15 Automated Google Play deployment** | Depends on #13 (shared tag-based trigger). Closes the Android distribution loop. Manual build + automated upload approach; see #21 for full build automation. |
 
 ### Phase 2 — Server distribution ✅ COMPLETE (core items)
 
