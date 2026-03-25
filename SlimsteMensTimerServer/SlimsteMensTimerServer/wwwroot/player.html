@@ -8,97 +8,61 @@
 </head>
 <body>
 
-  <!-- ══════════════════════════════════════════════════════
-       JOIN VIEW  (shown on page load, before player joins)
-       ══════════════════════════════════════════════════════ -->
-  <div id="joinView" class="container" style="padding-top:4rem">
+  <!-- ══ JOIN VIEW ══ -->
+  <div id="joinView" class="container" style="display:none; padding-top:4rem">
     <div class="title" style="font-size:1.4rem">De Slimste Mens</div>
-    <div class="card" style="max-width:380px;margin:0 auto;text-align:center">
-      <p style="opacity:.7;margin-bottom:1.5rem">
-        Sessie <strong style="color:var(--accent)">XK7P3Q</strong>
-      </p>
-      <input class="name-input" type="text" placeholder="Jouw naam" />
-      <button class="btn" style="margin-top:1rem;width:100%">Meedoen</button>
-      <p id="joinError" style="margin-top:1rem;opacity:.7;font-size:.9rem"></p>
+    <div class="card" style="max-width:380px; margin:0 auto; text-align:center">
+      <p id="joinSessionCode" style="opacity:.7; margin-bottom:1.5rem"></p>
+      <input id="nameInput" class="name-input" type="text" placeholder="Jouw naam"
+             maxlength="32" autocomplete="off" />
+      <button id="btnJoin" class="btn" style="margin-top:1rem; width:100%">Meedoen</button>
+      <p id="joinError" style="margin-top:1rem; opacity:.7; font-size:.9rem; min-height:1.2rem"></p>
     </div>
   </div>
 
-  <!-- ══════════════════════════════════════════════════════
-       WAITING VIEW  (after join, while session is in Lobby)
-       ══════════════════════════════════════════════════════ -->
-  <div id="waitView" class="container" style="display:none;padding-top:6rem;text-align:center">
+  <!-- ══ WAITING VIEW ══ -->
+  <div id="waitView" class="container" style="display:none; padding-top:6rem; text-align:center">
     <div class="title" style="font-size:1.4rem">De Slimste Mens</div>
-    <p style="opacity:.7;font-size:1.1rem">Wachten op de host om het spel te starten…</p>
+    <p style="opacity:.7; font-size:1.1rem">Wachten op de host om het spel te starten…</p>
   </div>
 
-  <!-- ══════════════════════════════════════════════════════
-       GAME VIEW  (active game — this is the design focus)
-       ══════════════════════════════════════════════════════ -->
-  <div id="gameView" class="player-layout">
+  <!-- ══ GAME VIEW ══ -->
+  <div id="gameView" class="player-layout" style="display:none">
 
-    <!-- ── Left sidebar: other players (landscape only) ── -->
+    <!-- Left sidebar: other players (landscape only) -->
     <div class="player-sidebar">
       <div class="others-heading">Andere spelers</div>
-      <div class="others-list">
-        <div class="others-tile">
-          <div class="others-score">120</div>
-          <div class="others-name">Noor</div>
-        </div>
-        <div class="others-tile">
-          <div class="others-score">40</div>
-          <div class="others-name">Lars</div>
-        </div>
-        <div class="others-tile stale">
-          <div class="others-score">60</div>
-          <div class="others-name">Emma</div>
-        </div>
-      </div>
+      <div id="othersSidebar" class="others-list"></div>
     </div>
 
-    <!-- ── Main area: own score, timer, controls ── -->
+    <!-- Main: own score, timer, controls -->
     <div class="player-main">
 
-      <!-- Game-ended banner (hidden during normal play) -->
-      <div class="banner" id="gameBanner" style="display:none">
-        Spel afgelopen.
-      </div>
+      <div class="banner" id="gameBanner" style="display:none">Spel afgelopen.</div>
 
-      <div class="player-own-name">Roald</div>
-      <div class="player-own-score" id="ownScore">80</div>
-
-      <div class="timer-bar-track">
-        <div class="timer-bar-fill" id="timerBar" style="width:75%"></div>
-      </div>
-      <div class="timer-text" id="timerText">45s</div>
+      <div class="player-own-name" id="ownName"></div>
+      <div class="player-own-score" id="ownScore">60</div>
 
       <div class="player-controls">
         <button class="btn btn-danger player-score-btn" id="btnMinus">−20</button>
         <button class="btn player-start-btn" id="btnStart">▶ Start</button>
         <button class="btn btn-danger player-score-btn" id="btnPlus">+20</button>
       </div>
+      <div style="text-align:center; margin-top:1.25rem">
+        <button class="btn btn-danger" id="btnReset" style="font-size:.9rem; padding:10px 28px">↺ Herstel (60)</button>
+      </div>
 
     </div>
 
-    <!-- ── Bottom panel: other players (portrait only) ── -->
+    <!-- Bottom panel: other players (portrait only) -->
     <div class="player-others-bottom">
       <div class="others-heading">Andere spelers</div>
-      <div class="others-row" id="othersRow">
-        <div class="others-tile">
-          <div class="others-score">120</div>
-          <div class="others-name">Noor</div>
-        </div>
-        <div class="others-tile">
-          <div class="others-score">40</div>
-          <div class="others-name">Lars</div>
-        </div>
-        <div class="others-tile stale">
-          <div class="others-score">60</div>
-          <div class="others-name">Emma</div>
-        </div>
-      </div>
+      <div id="othersBottom" class="others-row"></div>
     </div>
 
   </div><!-- /gameView -->
 
+  <script src="/js/signalr.min.js"></script>
+  <script src="/js/player.js"></script>
 </body>
 </html>

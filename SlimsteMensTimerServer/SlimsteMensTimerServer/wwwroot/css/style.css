@@ -255,37 +255,13 @@ body {
   line-height: 1;
 }
 
-/* Countdown bar */
-.timer-bar-track {
-  width: 100%;
-  max-width: 320px;
-  margin: 1rem auto 0.4rem;
-  height: 10px;
-  background: rgba(255, 255, 255, 0.2);
-  border-radius: 5px;
-  overflow: hidden;
-}
-
-.timer-bar-fill {
-  height: 100%;
-  background: var(--accent);
-  border-radius: 5px;
-  transition: width 1s linear;
-}
-
-.timer-text {
-  text-align: center;
-  font-size: 1.1rem;
-  opacity: 0.75;
-  margin-bottom: 1.5rem;
-}
-
 /* Control buttons row */
 .player-controls {
   display: flex;
   justify-content: center;
   align-items: center;
   gap: 0.75rem;
+  margin-top: 5rem;
 }
 
 .player-score-btn {

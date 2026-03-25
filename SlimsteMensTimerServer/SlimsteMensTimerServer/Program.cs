@@ -59,13 +59,13 @@ app.MapHub<GameHub>("/gamehub");
 app.MapHealthChecks("/health");
 
 // /join/{sessionId} — deep-link target encoded in the QR code.
-// Redirects to scoreboard when session is Active, otherwise to lobby.
+// Browser users land on player.html; the Android app parses this URL directly and never follows the redirect.
 app.MapGet("/join/{sessionId}", (string sessionId, SessionStore store) =>
 {
     var session = store.GetSession(sessionId);
-    if (session is null) return Results.Redirect("/lobby.html");
-    var page = session.State == SessionState.Active ? "scoreboard" : "lobby";
-    return Results.Redirect($"/{page}.html?session={sessionId}");
+    if (session is null || session.State == SessionState.Ended)
+        return Results.Redirect("/lobby.html");
+    return Results.Redirect($"/player.html?session={sessionId}");
 });
 
 // Log the server's LAN address on startup so it's easy to find
