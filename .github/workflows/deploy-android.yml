@@ -1,0 +1,31 @@
+name: Deploy Android to Google Play
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Release tag to deploy (e.g. v0.0.7)'
+        required: true
+        type: string
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download AAB from GitHub Release
+        run: |
+          gh release download "${{ inputs.tag }}" \
+            --pattern '*.aab' \
+            --dir android \
+            --repo ${{ github.repository }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload to Google Play (internal track)
+        uses: r0adkll/upload-google-play@v1
+        with:
+          serviceAccountJsonPlainText: ${{ secrets.PLAY_STORE_JSON_KEY }}
+          packageName: com.embarcadero.SlimsteMensTimer
+          releaseFiles: android/*.aab
+          track: internal
