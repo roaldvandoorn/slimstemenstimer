@@ -48,16 +48,19 @@ SlimsteMensTimerServer/
   SlimsteMensTimerServer.sln
   SlimsteMensTimerServer/
     Program.cs                  ← DI, SignalR, CORS, static files; UseWindowsService() for service hosting
-    Controllers/                ← REST API (sessions, players, QR code)
+    Controllers/                ← REST API (sessions, players, QR code, status)
     Hubs/GameHub.cs             ← SignalR hub
-    Models/                     ← Session, Player, SessionState
+    Models/                     ← Session, Player, SessionState, StartupInfo
     Services/                   ← SessionStore, HeartbeatMonitor, IpAddressHelper
-    wwwroot/                    ← lobby.html, scoreboard.html, JS, CSS
+    wwwroot/                    ← lobby.html, scoreboard.html, status.html, JS, CSS
+    appsettings.json            ← runtime config (urls, GameSettings)
+    appsettings.example.json    ← documented config reference
 installer/
   SlimsteMensTimerServer.iss    ← Inno Setup script; compiled in CI on tag push
   lobby.url                     ← Internet Shortcut bundled into installer (Start Menu)
 .github/workflows/
   ci.yml                        ← build-and-test on every push/PR; release job on v*.*.* tags
+SETUP.md                        ← Dutch non-technical setup guide (server → app → join)
 claude/
   PLAN.md                       ← step-by-step execution plan (current phase)
   PROGRESS.md                   ← progress log (current phase)
@@ -117,11 +120,12 @@ claude/
 
 ### REST API (`/api/...`)
 - `POST /api/sessions` → create session
-- `POST /api/sessions/{id}/players` → register player
+- `POST /api/sessions/{id}/players` → register player (409 if session full)
 - `PUT /api/sessions/{id}/players/{pid}/score` → push score
 - `POST /api/sessions/{id}/players/{pid}/heartbeat` → keep-alive
 - `GET /api/sessions/{id}/qr` → QR code PNG
-- Full API reference: `claude/PLAN.md`
+- `GET /api/status` → JSON: version, uptimeSeconds, activeSessions, totalPlayers
+- `GET /health` → ASP.NET health check (200 Healthy)
 
 ### Real-time (SignalR hub at `/gamehub`)
 - Browser clients join a session group via `JoinSessionGroup(sessionId)`
