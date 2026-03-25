@@ -229,6 +229,177 @@ body {
   margin-bottom: 1.5rem;
 }
 
+/* ── Player page ──────────────────────────────────────── */
+
+/* Full-viewport layout wrapper — column by default (portrait) */
+.player-layout {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  padding: 1rem 1rem 1.5rem;
+}
+
+/* Own score display */
+.player-own-name {
+  font-size: 1rem;
+  opacity: 0.65;
+  text-align: center;
+  margin-bottom: 0.25rem;
+}
+
+.player-own-score {
+  font-size: 6rem;
+  font-weight: bold;
+  color: var(--accent);
+  text-align: center;
+  line-height: 1;
+}
+
+/* Countdown bar */
+.timer-bar-track {
+  width: 100%;
+  max-width: 320px;
+  margin: 1rem auto 0.4rem;
+  height: 10px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 5px;
+  overflow: hidden;
+}
+
+.timer-bar-fill {
+  height: 100%;
+  background: var(--accent);
+  border-radius: 5px;
+  transition: width 1s linear;
+}
+
+.timer-text {
+  text-align: center;
+  font-size: 1.1rem;
+  opacity: 0.75;
+  margin-bottom: 1.5rem;
+}
+
+/* Control buttons row */
+.player-controls {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.player-score-btn {
+  width: 80px;
+  padding: 14px 0;
+  font-size: 1.2rem;
+}
+
+.player-start-btn { min-width: 130px; }
+
+/* Main area: expand to fill available height, center content vertically */
+.player-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+/* Other players — section heading */
+.others-heading {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  opacity: 0.6;
+  margin-bottom: 0.75rem;
+}
+
+/* Other players — compact tile */
+.others-tile {
+  background: var(--card-bg);
+  border-radius: 12px;
+  padding: 0.75rem 0.5rem;
+  text-align: center;
+  min-width: 72px;
+  transition: opacity 0.4s, background 0.4s;
+}
+
+.others-tile.stale {
+  opacity: 0.35;
+  background: var(--stale-bg);
+}
+
+.others-score {
+  font-size: 1.6rem;
+  font-weight: bold;
+  color: var(--accent);
+  line-height: 1;
+}
+
+.others-name {
+  font-size: 0.75rem;
+  opacity: 0.8;
+  margin-top: 0.3rem;
+  word-break: break-word;
+}
+
+/* Portrait: sidebar hidden, bottom panel visible */
+.player-sidebar { display: none; }
+
+.player-others-bottom {
+  padding-top: 1.5rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  margin-top: 1.5rem;
+}
+
+.others-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+/* Landscape: flip to row, show sidebar, hide bottom panel */
+@media (orientation: landscape) {
+  .player-layout {
+    flex-direction: row;
+    align-items: stretch;
+    gap: 1rem;
+  }
+
+  .player-sidebar {
+    display: flex;
+    flex-direction: column;
+    width: 130px;
+    flex-shrink: 0;
+    padding-right: 1rem;
+    border-right: 1px solid rgba(255, 255, 255, 0.1);
+    overflow-y: auto;
+  }
+
+  .player-sidebar .others-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .player-others-bottom { display: none; }
+}
+
+/* Join view input */
+.name-input {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border-radius: 50px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  background: rgba(0, 0, 0, 0.25);
+  color: var(--text);
+  font-size: 1.1rem;
+  text-align: center;
+  outline: none;
+}
+
+.name-input:focus { border-color: var(--accent); }
+.name-input::placeholder { opacity: 0.5; }
+
 /* ── Footer ───────────────────────────────────────────── */
 
 .page-footer {
