@@ -5,12 +5,16 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>De Slimste Mens — Meespelen</title>
   <link rel="stylesheet" href="/css/style.css" />
+  <link rel="stylesheet" href="/css/theme-toggle.css" />
+  <link rel="icon" type="image/png" href="/images/favicon.png" />
+  <script src="/js/theme.js"></script>
 </head>
 <body>
 
   <!-- ══ JOIN VIEW ══ -->
   <div id="joinView" class="container" style="display:none; padding-top:4rem">
-    <div class="title" style="font-size:1.4rem">De Slimste Mens</div>
+    <div class="logo-header"><img src="/images/logo-horiz.png" alt="De Slimste Mens Scorebord" /></div>
+    <div class="title text-title" style="font-size:1.4rem">De Slimste Mens</div>
     <div class="card" style="max-width:380px; margin:0 auto; text-align:center">
       <p id="joinSessionCode" style="opacity:.7; margin-bottom:1.5rem"></p>
       <input id="nameInput" class="name-input" type="text" placeholder="Jouw naam"
@@ -22,7 +26,8 @@
 
   <!-- ══ WAITING VIEW ══ -->
   <div id="waitView" class="container" style="display:none; padding-top:6rem; text-align:center">
-    <div class="title" style="font-size:1.4rem">De Slimste Mens</div>
+    <div class="logo-header"><img src="/images/logo-horiz.png" alt="De Slimste Mens Scorebord" /></div>
+    <div class="title text-title" style="font-size:1.4rem">De Slimste Mens</div>
     <p style="opacity:.7; font-size:1.1rem">Wachten op de host om het spel te starten…</p>
   </div>
 
@@ -64,5 +69,6 @@
 
   <script src="/js/signalr.min.js"></script>
   <script src="/js/player.js"></script>
+<button id="themeToggleBtn" onclick="toggleTheme()" title="Schakel thema">🎨</button>
 </body>
 </html>

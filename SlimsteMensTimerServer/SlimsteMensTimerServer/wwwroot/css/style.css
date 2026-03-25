@@ -1,9 +1,72 @@
+/* ── Google Fonts (used by quiz-show theme) ──────────────────────────────── */
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Lato:wght@400;700&display=swap');
+
+/* ── Classic theme (default) ─────────────────────────────────────────────── */
 :root {
-  --bg:       #B71C1C;
-  --accent:   #FFA726;
-  --text:     #FFFFFF;
-  --card-bg:  rgba(0, 0, 0, 0.25);
-  --stale-bg: rgba(0, 0, 0, 0.15);
+  --bg:           #B71C1C;
+  --accent:       #FFA726;
+  --text:         #FFFFFF;
+  --card-bg:      rgba(0, 0, 0, 0.25);
+  --stale-bg:     rgba(0, 0, 0, 0.15);
+  --font-heading: 'Segoe UI', Arial, sans-serif;
+  --font-body:    'Segoe UI', Arial, sans-serif;
+}
+
+/* ── Quiz-show theme ─────────────────────────────────────────────────────── */
+[data-theme="quiz-show"] {
+  --bg:           #0D1B3E;
+  --accent:       #C9A84C;
+  --text:         #F5ECD7;
+  --card-bg:      rgba(201, 168, 76, 0.45);
+  --stale-bg:     rgba(201, 168, 76, 0.20);
+  --font-heading: 'Playfair Display', Georgia, serif;
+  --font-body:    'Lato', 'Segoe UI', Arial, sans-serif;
+}
+
+[data-theme="quiz-show"] body {
+  font-family: var(--font-body);
+  background-image: url('/images/hero-bg.png');
+  background-size: cover;
+  background-position: center top;
+  background-attachment: fixed;
+}
+
+[data-theme="quiz-show"] .title,
+[data-theme="quiz-show"] h1,
+[data-theme="quiz-show"] h2 {
+  font-family: var(--font-heading);
+  letter-spacing: 0.03em;
+}
+
+[data-theme="quiz-show"] .card {
+  border: 1px solid rgba(201, 168, 76, 0.25);
+}
+
+/* ── Logo header ─────────────────────────────────────────────────────────── */
+.logo-header {
+  display: none;
+}
+
+.text-title {
+  display: block;
+}
+
+[data-theme="quiz-show"] .logo-header {
+  display: block;
+  width: 100%;
+  max-width: 620px;
+  margin: 0 auto 1.5rem;
+}
+
+[data-theme="quiz-show"] .logo-header img {
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 6px;
+}
+
+[data-theme="quiz-show"] .text-title {
+  display: none;
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -355,6 +418,11 @@ body {
     display: flex;
     flex-direction: column;
     gap: 0.75rem;
+  }
+
+  /* Counterbalance the sidebar so .player-main stays centred over the hero */
+  .player-main {
+    padding-right: 130px;
   }
 
   .player-others-bottom { display: none; }

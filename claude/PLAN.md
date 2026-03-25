@@ -1,6 +1,8 @@
 # De Slimste Mens Timer — Plan
 
-_No active phase. Choose the next phase from `improvements.md` and record the plan here._
+## Phase 8 — (TBD)
+
+*No active phase. Awaiting next task.*
 
 ---
 
@@ -14,3 +16,4 @@ _No active phase. Choose the next phase from `improvements.md` and record the pl
 | Phase 4 | Discoverability & polish (#17 #18 #19 #20) | `archive/PLAN_phase4_discoverability.md` |
 | Phase 5 | Google Play deployment + installer improvements (#15 + icons/stop-service) | `archive/PLAN_phase5_google_play.md` |
 | Phase 6 | Browser-based player client (#22) | `archive/PLAN_phase6_browser_player.md` |
+| Phase 7 | Web app theme & artwork (quiz-show style, Canva assets, switchable themes) | `archive/PLAN_phase7_web_theme.md` |
