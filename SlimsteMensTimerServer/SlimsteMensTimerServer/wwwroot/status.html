@@ -130,10 +130,13 @@
     return `${s}s`;
   }
 
+  function normalizeVersion(v) {
+    // Strip leading 'v' and any build metadata after '+' (e.g. v0.0.7+commitHash → 0.0.7)
+    return v.replace(/^v/, '').replace(/\+.*$/, '');
+  }
+
   function compareVersions(running, latest) {
-    // Strip leading 'v' for comparison
-    const strip = v => v.replace(/^v/, '');
-    return strip(running) !== strip(latest);
+    return normalizeVersion(running) !== normalizeVersion(latest);
   }
 
   let updateChecked = false;
@@ -168,7 +171,7 @@
 
       document.getElementById('statusDot').style.background = '#4caf50';
       document.getElementById('statusText').textContent = 'Online';
-      document.getElementById('valVersion').textContent = d.version;
+      document.getElementById('valVersion').textContent = normalizeVersion(d.version);
       document.getElementById('valUptime').textContent = formatUptime(d.uptimeSeconds);
       document.getElementById('valSessions').textContent = d.activeSessions;
       document.getElementById('valPlayers').textContent = d.totalPlayers;

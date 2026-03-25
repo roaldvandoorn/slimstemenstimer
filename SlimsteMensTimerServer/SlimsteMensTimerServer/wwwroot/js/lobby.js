@@ -16,6 +16,7 @@
     const btnStartGame   = document.getElementById('btnStartGame');
     const sessionCode    = document.getElementById('sessionCode');
     const qrImage        = document.getElementById('qrImage');
+    const qrLink         = document.getElementById('qrLink');
     const playerList     = document.getElementById('playerList');
     const bannerText     = document.getElementById('bannerText');
 
@@ -43,6 +44,7 @@
         sessionId = id;
         sessionCode.textContent = id;
         qrImage.src = `/api/sessions/${id}/qr`;
+        qrLink.href = `/join/${id}`;
         landingView.style.display = 'none';
         lobbyView.style.display   = 'block';
         connectSignalR(id);

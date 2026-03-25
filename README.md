@@ -24,6 +24,14 @@ An Android countdown timer and score tracker for the board game *De Slimste Mens
 - "Beëindig spel" ends the game and shows a "Nieuw Spel" link for all viewers
 - App download QR code on the landing page
 
+### Browser player client
+- Players who cannot or prefer not to install the Android app can join by opening the QR code URL in any phone browser
+- Enter your name, join the session, and get a scoring UI that mirrors the app: countdown timer (score counts down 1 pt/s), **+20 / −20** buttons, and a **↺ Herstel** button to reset the score to 60
+- Live mini-overview of other players' scores, visible at all times:
+  - **Portrait** (phones): compact tiles below the controls
+  - **Landscape** (tablets, monitors): sidebar to the left of the controls
+- Score synced to the server in real time; fully compatible with the Android app (both can be used in the same session)
+
 ## Project structure
 
 ```
@@ -52,7 +60,7 @@ SlimsteMensTimerServer/
     Hubs/GameHub.cs             ← SignalR hub
     Models/                     ← Session, Player, SessionState
     Services/                   ← SessionStore, HeartbeatMonitor, IpAddressHelper
-    wwwroot/                    ← lobby.html, scoreboard.html, JS, CSS
+    wwwroot/                    ← lobby.html, scoreboard.html, player.html, JS, CSS
 claude/
   PLAN.md                       ← step-by-step execution plan
   PROGRESS.md                   ← progress log
@@ -117,10 +125,22 @@ Open `http://<lan-ip>:5000` in a browser to reach the lobby.
 
 1. **Start the server** on the host machine.
 2. **Open the browser** at `http://<server-ip>:5000` and click **Nieuwe Sessie**.
-3. **Each player** opens the app, taps the hamburger menu → *Aanmelden bij spel*, and scans the QR code (or enters the URL manually).
+3. **Each player** joins using either option:
+   - **Android app** — tap the hamburger menu → *Aanmelden bij spel* → scan the QR code (or enter the URL manually).
+   - **Browser** — scan the QR code with any phone camera or browser, enter your name, and tap **Meedoen**. No app install required.
 4. Once all players have joined, the host clicks **Start Spel** in the browser.
 5. Players use **Start/Stop**, **+20**, **−20** during the game — scores update on the scoreboard in real time.
 6. When the game ends, the host clicks **Beëindig spel** on the scoreboard.
+
+### Android app vs browser client
+
+| | Android app | Browser client |
+|---|---|---|
+| Installation | Required (Google Play) | None — any phone browser |
+| Timer | Score counts down 1 pt/s | Score counts down 1 pt/s |
+| Score controls | +20 / −20 / Reset | +20 / −20 / ↺ Herstel |
+| Other players' scores | Not shown | Live tiles (sidebar / bottom) |
+| Works offline | Yes | No — requires server connection |
 
 ## Architecture
 
