@@ -58,6 +58,16 @@ public class GameHub : Hub
     }
 
     /// <summary>
+    /// Called by a web player when they trigger a correct or wrong answer sound.
+    /// Broadcasts AnswerSound to all session group members so the scoreboard
+    /// plays the appropriate sound effect.
+    /// </summary>
+    public async Task BroadcastAnswerSound(string sessionId, string soundType)
+    {
+        await Clients.Group(sessionId).SendAsync("AnswerSound", soundType);
+    }
+
+    /// <summary>
     /// Called automatically when a browser client disconnects.
     /// ASP.NET Core SignalR removes the connection from all groups automatically,
     /// so no explicit cleanup is needed here.

@@ -191,6 +191,11 @@
             showGameEnded();
         });
 
+        connection.on('AnswerSound', (soundType) => {
+            if (soundType === 'correct') playSound(sounds.correct);
+            else if (soundType === 'wrong') playSound(sounds.wrong);
+        });
+
         connection.on('TimerStarted', (playerId) => {
             activeTimers.add(playerId);
             updateClockLoop();

@@ -18,3 +18,4 @@
 | Phase 6 | Browser-based player client (#22) | `archive/PLAN_phase6_browser_player.md` |
 | Phase 7 | Web app theme & artwork (quiz-show style, Canva assets, switchable themes) | `archive/PLAN_phase7_web_theme.md` |
 | Phase 8 | Sound effects & answer buttons for scoreboard | `archive/PLAN_phase8_sound_effects.md` |
+| Phase 8b | Player audio controls (✓/✗ buttons on player page) | `archive/PLAN_phase8b_player_audio.md` |

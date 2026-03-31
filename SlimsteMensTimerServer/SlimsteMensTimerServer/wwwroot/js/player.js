@@ -42,8 +42,10 @@
     const btnReset    = document.getElementById('btnReset');
     const gameBanner  = document.getElementById('gameBanner');
 
-    const othersSidebar = document.getElementById('othersSidebar');
-    const othersBottom  = document.getElementById('othersBottom');
+    const othersSidebar    = document.getElementById('othersSidebar');
+    const othersBottom     = document.getElementById('othersBottom');
+    const btnPlayerCorrect = document.getElementById('btnPlayerCorrect');
+    const btnPlayerWrong   = document.getElementById('btnPlayerWrong');
 
     // ── Guard: must have ?session= ────────────────────────────────────────────
 
@@ -160,6 +162,16 @@
 
     btnMinus.addEventListener('click', () => { if (!gameEnded) applyScore(score - SCORE_STEP); });
     btnPlus.addEventListener('click',  () => { if (!gameEnded) applyScore(score + SCORE_STEP); });
+
+    btnPlayerCorrect.addEventListener('click', () => {
+        if (gameEnded || !hubConnection) return;
+        hubConnection.invoke('BroadcastAnswerSound', sessionId, 'correct').catch(() => {});
+    });
+
+    btnPlayerWrong.addEventListener('click', () => {
+        if (gameEnded || !hubConnection) return;
+        hubConnection.invoke('BroadcastAnswerSound', sessionId, 'wrong').catch(() => {});
+    });
     btnReset.addEventListener('click', () => {
         if (gameEnded) return;
         stopTimer();
@@ -242,10 +254,12 @@
         gameEnded = true;
         stopTimer();
         clearInterval(heartbeatInterval);
-        btnStart.disabled = true;
-        btnMinus.disabled = true;
-        btnPlus.disabled  = true;
-        btnReset.disabled = true;
+        btnStart.disabled         = true;
+        btnMinus.disabled         = true;
+        btnPlus.disabled          = true;
+        btnReset.disabled         = true;
+        btnPlayerCorrect.disabled = true;
+        btnPlayerWrong.disabled   = true;
         gameBanner.style.display = 'block';
         // Make sure we're on the game view (could still be in wait view)
         showView(gameView);

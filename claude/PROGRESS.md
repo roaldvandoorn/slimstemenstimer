@@ -16,3 +16,4 @@
 | Phase 6 | Browser-based player client (#22) | `archive/PROGRESS_phase6_browser_player.md` |
 | Phase 7 | Web app theme & artwork (quiz-show style, Canva assets, switchable themes) | `archive/PROGRESS_phase7_web_theme.md` |
 | Phase 8 | Sound effects & answer buttons for scoreboard | `archive/PROGRESS_phase8_sound_effects.md` |
+| Phase 8b | Player audio controls (✓/✗ buttons on player page) | `archive/PROGRESS_phase8b_player_audio.md` |

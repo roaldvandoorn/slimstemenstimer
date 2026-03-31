@@ -27,7 +27,7 @@ Record completed games locally (scores per round, fastest answers, winner). Show
 ### ✅ ~~3. 🔔 Sound effects & audio feedback~~ — **IMPLEMENTED**
 ~~Play distinct sounds for: timer start, timer end (buzzer), correct answer, wrong answer, and game over. Delphi FMX supports `TMediaPlayer`; sounds can be bundled as assets. Makes the game feel much more like the TV show.~~
 
-Implemented in Phase 8 (scoreboard/web only). 5 sounds: game-start (on scoreboard load), clock-tick loop (while any web player timer is active via TimerStarted/TimerStopped SignalR events), score-zero (when score hits 0), correct/wrong (host answer buttons). Floating mute FAB button bottom-right. Android app unchanged.
+Implemented in Phase 8 (scoreboard/web only). 5 sounds: game-start (on scoreboard load), clock-tick loop (while any web player timer is active via TimerStarted/TimerStopped SignalR events), score-zero (when score hits 0), correct/wrong (host answer buttons on scoreboard + player buttons on each player page via AnswerSound SignalR event — Phase 8b). Floating mute FAB button bottom-right. Android app unchanged.
 
 **Effort:** Low–Medium | **Value:** High
 
