@@ -1,6 +1,6 @@
 # De Slimste Mens Timer — Suggested Improvements
 
-_Updated: 2026-03-24_
+_Updated: 2026-03-25_
 
 ## Background
 
@@ -38,8 +38,10 @@ Instead of typing or scanning a QR code for the server IP, clients auto-discover
 
 ---
 
-### 5. 🎨 Theme / dark-mode support
-Add a proper "De Slimste Mens" branded visual theme (dark background, golden accents matching the TV show aesthetic) plus a light mode toggle. FMX styles make this feasible without rewriting layout.
+### ✅ ~~5. 🎨 Theme / dark-mode support~~ — **IMPLEMENTED**
+~~Add a proper "De Slimste Mens" branded visual theme (dark background, golden accents matching the TV show aesthetic) plus a light mode toggle. FMX styles make this feasible without rewriting layout.~~
+
+Implemented in Phase 7 (web app only). Switchable `classic` (red/orange) vs `quiz-show` (gold/navy) theme via `data-theme` on `<html>`, persisted in `localStorage`. Canva-exported artwork: hero background, logo, favicon. Floating 🎨 toggle button on all web pages. Default theme: `quiz-show`.
 
 **Effort:** Low–Medium | **Value:** Medium
 
@@ -212,7 +214,7 @@ Implemented in Phase 4. `/health` returns 200 Healthy; `/api/status` returns JSO
 | 7  | Configurable timer presets | Feature | Low | Medium |
 | 1  | Puzzle-card database & lookup | Feature | Medium | High |
 | 2  | Game statistics & history | Feature | Medium | High |
-| 5  | Theme / dark-mode support | Feature | Low–Med | Medium |
+| ~~5~~  | ~~Theme / dark-mode support~~ ✅ | Feature | Low–Med | Medium |
 | 4  | LAN server discovery | Feature | Medium | Medium |
 | 6  | Spectator mode | Feature | Medium | Medium |
 | 9  | Tablet / large-screen layout | Feature | Low–Med | Low–Med |
@@ -256,7 +258,7 @@ The recommended sequence builds each step on the previous one, avoids rework, an
 |------|------|-----------|
 | 11 | **#7 Configurable timer presets** | Lowest effort feature; immediately useful for every game night. |
 | 12 | **#3 Sound effects** | High perceived value, low effort once assets are sourced. |
-| 13 | **#5 Theme / dark-mode** | Visual polish; good to do before wider distribution. |
+| ~~13~~ | ~~**#5 Theme / dark-mode**~~ ✅ | Visual polish; good to do before wider distribution. |
 | 14 | **#2 Game statistics & history** | Adds long-term engagement value. |
 | 15 | **#1 Puzzle-card database** | Most ambitious feature; best tackled once distribution is solid. |
 | 16 | **#4 LAN server discovery** | Complements the installer; reduces setup friction further. |

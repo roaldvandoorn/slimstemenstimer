@@ -23,11 +23,27 @@ The plan lives in `claude/PLAN.md` and progress tracking in `claude/PROGRESS.md`
 
 ## Available IDEs & Tools
 
-- **Delphi 13.1** — Android app (FMX); also has DevExpress VCL Suite 25.2 (not applicable to FMX)
+- **Delphi 13.1** — cross-platform (Android, iOS, macOS, Linux) via FMX, and native Win32/Win64 via VCL; DevExpress VCL Suite 25.2 installed (VCL only, not FMX)
 - **Visual Studio 2022** — ASP.NET Core server (preferred for .NET)
 - **JetBrains Rider** — alternative .NET IDE
 - **Visual Studio Code** — general purpose
-- **Databases available**: SQL Server 2025, Interbase 2020 (server currently uses in-memory store)
+
+## Available Package Managers
+
+- **Chocolatey** — system-level packages
+- **npm** — Node.js packages
+
+**Always request explicit permission before installing any packages.**
+
+## Available Runtimes
+
+- **Python 3.13**
+- **Node.js**
+- **.NET 8 / ASP.NET Core 8**
+
+## Available Databases
+
+- SQL Server 2025, Interbase 2020 (server currently uses in-memory store)
 
 ## Repository Structure
 
