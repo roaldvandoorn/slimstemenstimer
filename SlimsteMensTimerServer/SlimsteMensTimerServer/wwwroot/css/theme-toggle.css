@@ -1,11 +1,10 @@
-/* ── Theme toggle button ──────────────────────────────────────────────────────
-   Fixed bottom-right on all pages. Clicking cycles between classic ↔ quiz-show.
+/* ── Floating action button (FAB) base ────────────────────────────────────────
+   Shared by the theme toggle and mute buttons — small fixed circles, bottom-right.
    ─────────────────────────────────────────────────────────────────────────── */
 
-#themeToggleBtn {
+.fab-btn {
   position: fixed;
   bottom: 1.25rem;
-  right: 1.25rem;
   z-index: 9999;
 
   width: 2.75rem;
@@ -28,9 +27,28 @@
   -webkit-backdrop-filter: blur(4px);
 }
 
-#themeToggleBtn:hover {
+.fab-btn:hover {
   background: rgba(0, 0, 0, 0.55);
   transform: scale(1.08);
+}
+
+/* ── Mute button — sits to the left of the theme button ───────────────────── */
+
+#btnMute {
+  right: calc(1.25rem + 2.75rem + 0.6rem); /* theme button width + gap */
+}
+
+#btnMute.muted {
+  border-color: rgba(255, 255, 255, 0.15);
+  opacity: 0.6;
+}
+
+/* ── Theme toggle button ──────────────────────────────────────────────────────
+   Fixed bottom-right on all pages. Clicking cycles between classic ↔ quiz-show.
+   ─────────────────────────────────────────────────────────────────────────── */
+
+#themeToggleBtn {
+  right: 1.25rem;
 }
 
 /* Highlight when quiz-show theme is active */

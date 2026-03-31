@@ -23,6 +23,12 @@
   <!-- Scoreboard grid — tiles are added dynamically -->
   <div class="scoreboard-grid" id="scoreGrid"></div>
 
+  <!-- Answer sound buttons -->
+  <div class="answer-controls">
+    <button id="btnCorrect" class="btn btn-correct">✓ Goed</button>
+    <button id="btnWrong"   class="btn btn-wrong">✗ Fout</button>
+  </div>
+
   <!-- Host controls -->
   <div class="host-controls">
     <button id="btnEndGame"  class="btn btn-danger">Beëindig spel</button>
@@ -36,9 +42,10 @@
 
 </div>
 
+<button id="btnMute" class="fab-btn fab-btn--mute" title="Geluid aan">🔊</button>
+<button id="themeToggleBtn" class="fab-btn" onclick="toggleTheme()" title="Schakel thema">🎨</button>
 <script src="/js/signalr.min.js"></script>
 <script src="/js/scoreboard.js"></script>
-<button id="themeToggleBtn" onclick="toggleTheme()" title="Schakel thema">🎨</button>
 <script>
   fetch('/api/status').then(r => r.ok ? r.json() : null).then(d => {
     if (d) document.getElementById('footerVersion').textContent = ' · ' + d.version;

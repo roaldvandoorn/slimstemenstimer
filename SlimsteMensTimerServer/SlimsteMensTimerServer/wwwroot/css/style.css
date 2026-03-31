@@ -247,6 +247,34 @@ body {
   word-break: break-word;
 }
 
+/* ── Answer sound buttons ─────────────────────────────── */
+
+.answer-controls {
+  display: flex;
+  justify-content: center;
+  gap: 1.5rem;
+  margin-top: 2rem;
+  width: 100%;
+}
+
+.btn-correct {
+  background-color: rgba(46, 125, 50, 0.75);
+  border: 2px solid rgba(255, 255, 255, 0.25);
+  font-size: 1.1rem;
+  min-width: 8rem;
+}
+
+.btn-correct:hover { background-color: rgba(46, 125, 50, 0.95); opacity: 1; }
+
+.btn-wrong {
+  background-color: rgba(183, 28, 28, 0.75);
+  border: 2px solid rgba(255, 255, 255, 0.25);
+  font-size: 1.1rem;
+  min-width: 8rem;
+}
+
+.btn-wrong:hover { background-color: rgba(183, 28, 28, 0.95); opacity: 1; }
+
 /* ── Host controls ────────────────────────────────────── */
 
 .host-controls {

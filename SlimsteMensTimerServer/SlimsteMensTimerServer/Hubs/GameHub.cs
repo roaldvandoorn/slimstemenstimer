@@ -38,6 +38,26 @@ public class GameHub : Hub
     }
 
     /// <summary>
+    /// Called by the web player when its countdown timer starts.
+    /// Broadcasts TimerStarted to all session group members so the scoreboard
+    /// can start the clock sound loop.
+    /// </summary>
+    public async Task BroadcastTimerStarted(string sessionId, string playerId)
+    {
+        await Clients.Group(sessionId).SendAsync("TimerStarted", playerId);
+    }
+
+    /// <summary>
+    /// Called by the web player when its countdown timer stops (manually or at zero).
+    /// Broadcasts TimerStopped to all session group members so the scoreboard
+    /// can stop the clock sound loop when no timers are active.
+    /// </summary>
+    public async Task BroadcastTimerStopped(string sessionId, string playerId)
+    {
+        await Clients.Group(sessionId).SendAsync("TimerStopped", playerId);
+    }
+
+    /// <summary>
     /// Called automatically when a browser client disconnects.
     /// ASP.NET Core SignalR removes the connection from all groups automatically,
     /// so no explicit cleanup is needed here.

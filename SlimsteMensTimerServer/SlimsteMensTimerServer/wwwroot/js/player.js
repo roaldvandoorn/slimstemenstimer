@@ -22,6 +22,7 @@
     let timerInterval     = null;
     let heartbeatInterval = null;
     let gameEnded         = false;
+    let hubConnection     = null;
 
     // ── DOM refs ─────────────────────────────────────────────────────────────
 
@@ -139,6 +140,7 @@
         timerRunning = true;
         btnStart.textContent = '⏸ Stop';
         timerInterval = setInterval(tickTimer, 1000);
+        if (hubConnection) hubConnection.invoke('BroadcastTimerStarted', sessionId, playerId).catch(() => {});
     }
 
     function stopTimer() {
@@ -146,6 +148,7 @@
         btnStart.textContent = '▶ Start';
         clearInterval(timerInterval);
         timerInterval = null;
+        if (hubConnection) hubConnection.invoke('BroadcastTimerStopped', sessionId, playerId).catch(() => {});
     }
 
     function tickTimer() {
@@ -251,7 +254,7 @@
     // ── SignalR ──────────────────────────────────────────────────────────────
 
     function connectSignalR() {
-        const connection = new signalR.HubConnectionBuilder()
+        const connection = hubConnection = new signalR.HubConnectionBuilder()
             .withUrl('/gamehub')
             .withAutomaticReconnect()
             .build();

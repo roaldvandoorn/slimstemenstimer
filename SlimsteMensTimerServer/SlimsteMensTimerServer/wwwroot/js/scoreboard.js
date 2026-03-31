@@ -15,6 +15,38 @@
     const sessionEl  = document.getElementById('sessionSubtitle');
     const btnEnd     = document.getElementById('btnEndGame');
     const btnNew     = document.getElementById('btnNewGame');
+    const btnCorrect = document.getElementById('btnCorrect');
+    const btnWrong   = document.getElementById('btnWrong');
+    const btnMute    = document.getElementById('btnMute');
+
+    // ── Sound engine ─────────────────────────────────────────────────────────
+
+    const sounds = {
+        gameStart: new Audio('/audio/game-start.mp3'),
+        clock:     new Audio('/audio/clock-tick.mp3'),
+        scoreZero: new Audio('/audio/score-zero.mp3'),
+        correct:   new Audio('/audio/correct.mp3'),
+        wrong:     new Audio('/audio/wrong.mp3'),
+    };
+    sounds.clock.loop = true;
+
+    let muted        = false;
+    let activeTimers = new Set(); // playerIds with an active countdown
+
+    function playSound(sound) {
+        if (muted) return;
+        sound.currentTime = 0;
+        sound.play().catch(() => {}); // suppress autoplay-policy errors
+    }
+
+    function updateClockLoop() {
+        if (activeTimers.size > 0) {
+            if (sounds.clock.paused) playSound(sounds.clock);
+        } else {
+            sounds.clock.pause();
+            sounds.clock.currentTime = 0;
+        }
+    }
 
     // ── Guard ────────────────────────────────────────────────────────────────
 
@@ -48,6 +80,28 @@
         window.location.href = '/lobby.html';
     });
 
+    // ── Answer buttons ────────────────────────────────────────────────────────
+
+    btnCorrect.addEventListener('click', () => playSound(sounds.correct));
+    btnWrong.addEventListener('click',   () => playSound(sounds.wrong));
+
+    // ── Mute toggle ───────────────────────────────────────────────────────────
+
+    btnMute.addEventListener('click', () => {
+        muted = !muted;
+        if (muted) {
+            sounds.clock.pause();
+            btnMute.textContent = '🔇';
+            btnMute.title = 'Geluid uit';
+            btnMute.classList.add('muted');
+        } else {
+            updateClockLoop();
+            btnMute.textContent = '🔊';
+            btnMute.title = 'Geluid aan';
+            btnMute.classList.remove('muted');
+        }
+    });
+
     function showGameEnded() {
         banner.innerHTML = 'Het spel is afgelopen. <a href="/lobby.html" class="banner-link">Nieuw Spel</a>';
         banner.style.display = 'block';
@@ -60,6 +114,10 @@
     async function init() {
         await loadPlayers();
         connectSignalR();
+        // Play game-start sound on load — the scoreboard is always opened when the
+        // game starts (lobby navigates here after GameStarted), so the event itself
+        // will never be received by this page.
+        playSound(sounds.gameStart);
     }
 
     async function loadPlayers() {
@@ -112,6 +170,11 @@
 
         connection.on('ScoreUpdated', (playerId, playerName, score) => {
             upsertTile(playerId, playerName, score, false);
+            if (score === 0) {
+                activeTimers.delete(playerId);
+                updateClockLoop();
+                playSound(sounds.scoreZero);
+            }
         });
 
         connection.on('PlayerWentStale', (playerId) => {
@@ -123,7 +186,19 @@
         });
 
         connection.on('GameEnded', () => {
+            activeTimers.clear();
+            updateClockLoop();
             showGameEnded();
+        });
+
+        connection.on('TimerStarted', (playerId) => {
+            activeTimers.add(playerId);
+            updateClockLoop();
+        });
+
+        connection.on('TimerStopped', (playerId) => {
+            activeTimers.delete(playerId);
+            updateClockLoop();
         });
 
         connection.start()
