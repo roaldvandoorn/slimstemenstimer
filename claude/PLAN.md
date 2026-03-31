@@ -1,6 +1,6 @@
 # De Slimste Mens Timer — Plan
 
-## Phase 8 — (TBD)
+## Phase 9 — (TBD)
 
 *No active phase. Awaiting next task.*
 
@@ -17,3 +17,4 @@
 | Phase 5 | Google Play deployment + installer improvements (#15 + icons/stop-service) | `archive/PLAN_phase5_google_play.md` |
 | Phase 6 | Browser-based player client (#22) | `archive/PLAN_phase6_browser_player.md` |
 | Phase 7 | Web app theme & artwork (quiz-show style, Canva assets, switchable themes) | `archive/PLAN_phase7_web_theme.md` |
+| Phase 8 | Sound effects & answer buttons for scoreboard | `archive/PLAN_phase8_sound_effects.md` |

@@ -1,6 +1,6 @@
 # De Slimste Mens Timer — Suggested Improvements
 
-_Updated: 2026-03-25_
+_Updated: 2026-03-31_
 
 ## Background
 
@@ -24,8 +24,10 @@ Record completed games locally (scores per round, fastest answers, winner). Show
 
 ---
 
-### 3. 🔔 Sound effects & audio feedback
-Play distinct sounds for: timer start, timer end (buzzer), correct answer, wrong answer, and game over. Delphi FMX supports `TMediaPlayer`; sounds can be bundled as assets. Makes the game feel much more like the TV show.
+### ✅ ~~3. 🔔 Sound effects & audio feedback~~ — **IMPLEMENTED**
+~~Play distinct sounds for: timer start, timer end (buzzer), correct answer, wrong answer, and game over. Delphi FMX supports `TMediaPlayer`; sounds can be bundled as assets. Makes the game feel much more like the TV show.~~
+
+Implemented in Phase 8 (scoreboard/web only). 5 sounds: game-start (on scoreboard load), clock-tick loop (while any web player timer is active via TimerStarted/TimerStopped SignalR events), score-zero (when score hits 0), correct/wrong (host answer buttons). Floating mute FAB button bottom-right. Android app unchanged.
 
 **Effort:** Low–Medium | **Value:** High
 
@@ -210,7 +212,7 @@ Implemented in Phase 4. `/health` returns 200 Healthy; `/api/status` returns JSO
 | ~~19~~ | ~~Server config via appsettings~~ ✅ | Ease of use | Low–Med | Medium |
 | 21 | Self-hosted runner — automated Android build | DevOps | Low | Medium |
 | ~~22~~ | ~~Browser-based player client~~ ✅ | Feature | Medium | High |
-| 3  | Sound effects & audio feedback | Feature | Low–Med | High |
+| ~~3~~  | ~~Sound effects & audio feedback~~ ✅ | Feature | Low–Med | High |
 | 7  | Configurable timer presets | Feature | Low | Medium |
 | 1  | Puzzle-card database & lookup | Feature | Medium | High |
 | 2  | Game statistics & history | Feature | Medium | High |
@@ -257,7 +259,7 @@ The recommended sequence builds each step on the previous one, avoids rework, an
 | Step | Item | Rationale |
 |------|------|-----------|
 | 11 | **#7 Configurable timer presets** | Lowest effort feature; immediately useful for every game night. |
-| 12 | **#3 Sound effects** | High perceived value, low effort once assets are sourced. |
+| ~~12~~ | ~~**#3 Sound effects**~~ ✅ | High perceived value, low effort once assets are sourced. |
 | ~~13~~ | ~~**#5 Theme / dark-mode**~~ ✅ | Visual polish; good to do before wider distribution. |
 | 14 | **#2 Game statistics & history** | Adds long-term engagement value. |
 | 15 | **#1 Puzzle-card database** | Most ambitious feature; best tackled once distribution is solid. |
