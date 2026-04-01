@@ -92,6 +92,9 @@
     function deriveRole(ctx) {
         if (!ctx || ctx.round === 'None') return null;
 
+        // Round369 is over when all 15 questions have been played
+        if (ctx.round === 'Round369' && ctx.questionIndex > 15) return null;
+
         if (ctx.round === 'Finale') {
             if (Array.isArray(ctx.finalistIds) && ctx.finalistIds.includes(playerId)) {
                 return ctx.candidateId === playerId ? 'finalist-active' : 'finalist-inactive';
@@ -497,6 +500,15 @@
             currentContext.candidateId  = candidateId;
             currentContext.quizmasterId = quizmasterId;
             setRole(deriveRole(currentContext), currentContext.round);
+        });
+
+        connection.on('QuestionAdvanced', questionIndex => {
+            if (!currentContext) return;
+            currentContext.questionIndex = questionIndex;
+            // Disable all controls when Round369 completes after question 15
+            if (currentRound === 'Round369' && questionIndex > 15) {
+                setRole(null, 'None');
+            }
         });
 
         connection.on('TileMarked', (tileIndex, _round) => {

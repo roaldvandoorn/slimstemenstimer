@@ -17,7 +17,7 @@ See full plan: `archive/PLAN_phase10_rounds.md`
 | S5 | Scoreboard rework (round header + tile area) | ✅ Done |
 | S6 | Player page rework: role-aware controls | ✅ Done |
 | S7 | Round 3-6-9 auto-start + advancement logic | ✅ Done |
-| S8 | Rounds OpenDeur, Puzzel, Ingelijst: start-flow + advancement | ⬜ Pending |
+| S8 | Rounds OpenDeur, Puzzel, Ingelijst: start-flow + advancement | ✅ Done |
 | S9 | Finale round | ⬜ Pending |
 | S10 | Integration, polish, and state restore on rejoin | ⬜ Pending |
 | S11 | Sound effect wiring for new rounds | ⬜ Pending |

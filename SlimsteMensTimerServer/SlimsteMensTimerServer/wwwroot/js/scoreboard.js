@@ -217,6 +217,23 @@
         });
     }
 
+    function addStartRoundButton(roundName, label) {
+        const btn = document.createElement('button');
+        btn.className   = 'btn btn-start-round';
+        btn.textContent = label;
+        btn.addEventListener('click', async () => {
+            btn.disabled = true;
+            try {
+                await fetch(`/api/sessions/${sessionId}/rounds/start/${roundName}`, { method: 'POST' });
+            } catch (err) {
+                console.error(`start/${roundName} failed:`, err);
+                btn.disabled = false;
+            }
+        });
+        roundControlsEl.appendChild(btn);
+        roundControlsEl.style.display = 'flex';
+    }
+
     function renderRoundTiles(ctx) {
         roundTilesEl.innerHTML   = '';
         roundControlsEl.innerHTML = '';
@@ -224,11 +241,17 @@
         roundControlsEl.style.display = 'none';
 
         switch (ctx.round) {
-            case 'Round369':  renderRound369Tiles(ctx);           break;
-            case 'OpenDeur':  renderAnswerTiles(ctx.answerTiles, 4); break;
-            case 'Puzzel':    renderAnswerTiles(ctx.answerTiles, 3); break;
-            case 'Ingelijst': renderIngelijstTiles(ctx);          break;
-            // Finale: no tile area
+            case 'Round369':  renderRound369Tiles(ctx);              break;
+            case 'OpenDeur':
+                renderAnswerTiles(ctx.answerTiles, 4);
+                addStartRoundButton('puzzel', 'Start Puzzel');
+                break;
+            case 'Puzzel':
+                renderAnswerTiles(ctx.answerTiles, 3);
+                addStartRoundButton('ingelijst', 'Start Ingelijst');
+                break;
+            case 'Ingelijst': renderIngelijstTiles(ctx);             break;
+            // Finale: no tile area; start button handled in S9
         }
     }
 
@@ -243,6 +266,11 @@
             if (ctx.answerTiles[i - 1])    box.classList.add('correct');
             box.textContent = i;
             roundTilesEl.appendChild(box);
+        }
+
+        // After all 15 questions, offer transition to next round
+        if (ctx.questionIndex > 15) {
+            addStartRoundButton('opendeur', 'Start Open Deur');
         }
     }
 

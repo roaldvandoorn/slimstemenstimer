@@ -371,6 +371,14 @@ body {
 
 .btn-volgende:hover { background-color: rgba(77, 208, 225, 0.45); opacity: 1; }
 
+.btn-start-round {
+  background-color: rgba(255, 167, 38, 0.25);
+  border: 2px solid rgba(255, 167, 38, 0.6);
+  min-width: 10rem;
+}
+
+.btn-start-round:hover { background-color: rgba(255, 167, 38, 0.45); opacity: 1; }
+
 /* ── Answer sound buttons ─────────────────────────────── */
 
 .answer-controls {
