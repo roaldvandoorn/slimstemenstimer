@@ -69,13 +69,13 @@
     const STORAGE_KEY = `player-${sessionId}`;
 
     function saveIdentity(pid, name) {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify({ playerId: pid, playerName: name }));
+        sessionStorage.setItem(STORAGE_KEY, JSON.stringify({ playerId: pid, playerName: name }));
     }
 
-    function clearIdentity() { localStorage.removeItem(STORAGE_KEY); }
+    function clearIdentity() { sessionStorage.removeItem(STORAGE_KEY); }
 
     function loadIdentity() {
-        try { return JSON.parse(localStorage.getItem(STORAGE_KEY)); }
+        try { return JSON.parse(sessionStorage.getItem(STORAGE_KEY)); }
         catch { return null; }
     }
 
