@@ -20,17 +20,31 @@ An Android countdown timer and score tracker for the board game *De Slimste Mens
 ### Web scoreboard (server)
 - Host creates a session in the browser; players join via QR scan
 - Real-time scoreboard updates as players' scores change
-- Session lobby with player list and "Start Spel" button
+- Session lobby with drag-and-drop player ordering and "Start Spel" button
 - "Beëindig spel" ends the game and shows a "Nieuw Spel" link for all viewers
 - App download QR code on the landing page
+- **Rounds system**: full De Slimste Mens round structure managed from the scoreboard:
+  - **3-6-9** (auto-starts with the game): 15 questions, scoring questions highlighted (3, 6, 9, 12, 15), tile per correct answer, wrong answer advances the turn
+  - **Open Deur**: 4 correct-answer tiles per candidate; candidate controls their timer, quizmaster marks correct/wrong answers
+  - **Puzzel**: 3 correct-answer tiles per candidate; same flow as Open Deur
+  - **Ingelijst**: 10 picture tiles; quizmaster marks tiles, "Volgende" button advances to next quizmaster
+  - **Finale**: 2 finalists, 5 answer tiles per turn; lowest-scoring finalist goes first each question; stopping the timer or marking the 5th correct answer ends the turn
+- Round header shows current round name and progress (e.g. "Open Deur — Vraag 2 van 5")
+- Active candidate and quizmaster tiles are highlighted on the scoreboard
 
 ### Browser player client
 - Players who cannot or prefer not to install the Android app can join by opening the QR code URL in any phone browser
 - Enter your name, join the session, and get a scoring UI that mirrors the app: countdown timer (score counts down 1 pt/s), **+20 / −20** buttons, and a **↺ Herstel** button to reset the score to 60
+- **Role-aware controls**: the player page automatically shows the right controls for your current role:
+  - **Kandidaat** (candidate): Start/Stop timer, Klaar button to end your turn
+  - **Quizmaster**: ✓ Goed / ✗ Fout answer buttons; Ingelijst tile grid (10 buttons) + Volgende
+  - **Other players**: +20 / −20 always available for score corrections during hectic rounds
+- **Role indicator**: "KANDIDAAT" or "QUIZMASTER" label shown in amber/teal when you have a role
 - Live mini-overview of other players' scores, visible at all times:
   - **Portrait** (phones): compact tiles below the controls
   - **Landscape** (tablets, monitors): sidebar to the left of the controls
 - Score synced to the server in real time; fully compatible with the Android app (both can be used in the same session)
+- **Auto-resume**: if a player refreshes the page, locks their screen, or closes and reopens the browser tab, they are automatically returned to their game — no re-entering their name, no lost score
 
 ## Project structure
 
@@ -56,11 +70,11 @@ SlimsteMensTimerServer/
   SlimsteMensTimerServer/
     Program.cs                  ← DI, SignalR, CORS, static files, startup log
     appsettings.json            ← port (5000), StaleSeconds, SessionTimeoutHours
-    Controllers/                ← REST API: sessions, players, QR code
+    Controllers/                ← REST API: sessions, players, QR code, rounds
     Hubs/GameHub.cs             ← SignalR hub
-    Models/                     ← Session, Player, SessionState
-    Services/                   ← SessionStore, HeartbeatMonitor, IpAddressHelper
-    wwwroot/                    ← lobby.html, scoreboard.html, player.html, JS, CSS
+    Models/                     ← Session, Player, SessionState, RoundContext, RoundState
+    Services/                   ← SessionStore, HeartbeatMonitor, IpAddressHelper, RoundService
+    wwwroot/                    ← lobby.html, scoreboard.html, player.html, JS, CSS, audio/
 claude/
   PLAN.md                       ← step-by-step execution plan
   PROGRESS.md                   ← progress log
@@ -161,7 +175,7 @@ Open `http://<lan-ip>:5000` in a browser to reach the lobby.
 |---|---|---|
 | `/api/sessions` | POST | Create session → `{ sessionId, joinUrl }` |
 | `/api/sessions/{id}` | GET | Get session state and player list |
-| `/api/sessions/{id}/start` | POST | Start the game |
+| `/api/sessions/{id}/start` | POST | Start the game (auto-starts Round369) |
 | `/api/sessions/{id}` | DELETE | End and delete the session |
 | `/api/sessions/{id}/players` | POST | Register player → `{ playerId }` |
 | `/api/sessions/{id}/players` | GET | List all players |
@@ -169,6 +183,12 @@ Open `http://<lan-ip>:5000` in a browser to reach the lobby.
 | `/api/sessions/{id}/players/{pid}/heartbeat` | POST | Keep-alive (every 15 s) |
 | `/api/sessions/{id}/qr` | GET | QR code PNG encoding the join URL |
 | `/api/appqr` | GET | QR code PNG encoding the app download link |
+| `/api/sessions/{id}/rounds/start/{roundName}` | POST | Start a named round (opendeur, puzzel, ingelijst, finale) |
+| `/api/sessions/{id}/rounds/correct` | POST | Round369: mark current tile correct, advance question |
+| `/api/sessions/{id}/rounds/nextturn` | POST | Advance candidate/quizmaster roles per round rules |
+| `/api/sessions/{id}/rounds/nextquestion` | POST | Advance question index without changing roles |
+| `/api/sessions/{id}/rounds/marktile/{i}` | POST | Mark answer tile i as correct |
+| `/api/sessions/{id}/rounds/nextquizmaster` | POST | Ingelijst: advance to next quizmaster, reset tiles |
 
 ### SignalR events (server → browser)
 
@@ -180,3 +200,10 @@ Open `http://<lan-ip>:5000` in a browser to reach the lobby.
 | `PlayerReturned` | Heartbeat or score received from stale player |
 | `GameStarted` | Host clicked Start Spel |
 | `GameEnded` | Host ended the session or 2-hour idle timeout |
+| `TimerStarted` | A player started their countdown |
+| `TimerStopped` | A player stopped their countdown |
+| `AnswerSound` | A player or the scoreboard triggered a correct/wrong sound |
+| `RoundChanged` | A new round started (carries full RoundContext) |
+| `TileMarked` | An answer tile was marked correct (tileIndex, round) |
+| `QuestionAdvanced` | Question index incremented (questionIndex) |
+| `TurnAdvanced` | Candidate/quizmaster changed (candidateId, quizmasterId, questionIndex) |

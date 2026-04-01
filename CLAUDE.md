@@ -68,7 +68,7 @@ SlimsteMensTimerServer/
     Hubs/GameHub.cs             ← SignalR hub
     Models/                     ← Session, Player, SessionState, StartupInfo
     Services/                   ← SessionStore, HeartbeatMonitor, IpAddressHelper
-    wwwroot/                    ← lobby.html, scoreboard.html, status.html, JS, CSS
+    wwwroot/                    ← lobby.html, scoreboard.html, player.html, status.html, JS, CSS, audio/
     appsettings.json            ← runtime config (urls, GameSettings)
     appsettings.example.json    ← documented config reference
 installer/
@@ -142,10 +142,23 @@ claude/
 - `GET /api/sessions/{id}/qr` → QR code PNG
 - `GET /api/status` → JSON: version, uptimeSeconds, activeSessions, totalPlayers
 - `GET /health` → ASP.NET health check (200 Healthy)
+- `POST /api/sessions/{id}/rounds/start/{roundName}` → start named round (opendeur, puzzel, ingelijst, finale); Round369 auto-starts with game
+- `POST /api/sessions/{id}/rounds/correct` → Round369 only: mark current tile correct + advance question
+- `POST /api/sessions/{id}/rounds/nextturn` → advance candidate/quizmaster per round rules; plays wrong-answer sound in Round369
+- `POST /api/sessions/{id}/rounds/nextquestion` → advance question index without role change
+- `POST /api/sessions/{id}/rounds/marktile/{i}` → mark answer tile i correct (0-based)
+- `POST /api/sessions/{id}/rounds/nextquizmaster` → Ingelijst only: advance to next quizmaster, reset tiles
+
+### Round system (`Services/RoundService.cs`, `Models/RoundContext.cs`)
+- `RoundState` enum: `None, Round369, OpenDeur, Puzzel, Ingelijst, Finale, Ended`
+- `RoundContext`: `CandidateId`, `QuizmasterId`, `QuestionIndex`, `AnswerTiles[]`, `FinalistIds`, `TurnCycleCount`
+- `RoundService` singleton: all round mutation logic (`InitialiseRound369`, `InitialiseNamedRound`, `NextTurn`, `NextQuestion`, `MarkTile`, `NextQuizmaster`, `BuildRoundPayload`)
+- Finale rules: 5 tiles per turn; lowest-scoring finalist goes first each question; stop timer OR mark 5th tile ends the turn; wrong answer plays sound only; `TurnCycleCount` tracks within-question turns
 
 ### Real-time (SignalR hub at `/gamehub`)
 - Browser clients join a session group via `JoinSessionGroup(sessionId)`
-- Server broadcasts: `PlayerJoined`, `ScoreUpdated`, `PlayerWentStale`, `PlayerReturned`, `GameStarted`, `GameEnded`
+- Server broadcasts: `PlayerJoined`, `ScoreUpdated`, `PlayerWentStale`, `PlayerReturned`, `GameStarted`, `GameEnded`, `TimerStarted(playerId)`, `TimerStopped(playerId)`, `AnswerSound(soundType)`, `RoundChanged(ctx)`, `TileMarked(tileIndex, round)`, `QuestionAdvanced(questionIndex)`, `TurnAdvanced(candidateId, quizmasterId, questionIndex)`
+- Client-invokable hub methods: `BroadcastTimerStarted(sessionId, playerId)`, `BroadcastTimerStopped(sessionId, playerId)`, `BroadcastAnswerSound(sessionId, soundType)`
 - Delphi app does NOT use SignalR — REST only
 
 ### Session lifecycle
