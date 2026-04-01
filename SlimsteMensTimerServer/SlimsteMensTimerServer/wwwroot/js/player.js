@@ -114,9 +114,9 @@
 
         const inRound = role !== null && currentRound !== 'None';
 
-        // Default: everything enabled only in pre-round state
-        let minusEn   = !inRound;
-        let plusEn    = !inRound;
+        // +20 / -20 are always available so players can correct scores at any time
+        let minusEn   = true;
+        let plusEn    = true;
         let startEn   = !inRound;
         let klaarEn   = false;
         let correctEn = !inRound;
@@ -127,8 +127,6 @@
         if (inRound) {
             switch (role) {
                 case 'candidate':
-                    minusEn = true;
-                    plusEn  = true;
                     if (currentRound !== 'Round369') {
                         startEn = true;
                         klaarEn = true;
@@ -145,16 +143,10 @@
                     break;
 
                 case 'finalist-active':
-                    // Start/Stop only — countdown their score
                     startEn = true;
                     break;
 
-                case 'finalist-inactive':
-                    // −20 self-deduct (confirmed decision #3)
-                    minusEn = true;
-                    break;
-
-                // 'other': all false
+                // 'finalist-inactive' and 'other': only +20/-20 (already true)
             }
         }
 
@@ -326,21 +318,21 @@
                 console.error('correct failed:', err);
             }
             btnPlayerCorrect.disabled = false;
-        } else if (currentRound === 'Finale') {
-            // Quizmaster marks next correct answer tile; auto-nextturn after 5th
+        } else if (currentRound === 'OpenDeur' || currentRound === 'Puzzel' || currentRound === 'Finale') {
+            // Quizmaster marks next correct answer tile sequentially
             if (!currentContext?.answerTiles) return;
             const nextTile = currentContext.answerTiles.findIndex(t => !t);
-            if (nextTile === -1) return;  // all 5 already marked
+            if (nextTile === -1) return;  // all tiles already marked
             btnPlayerCorrect.disabled = true;
             try {
                 await fetch(`/api/sessions/${sessionId}/rounds/marktile/${nextTile}`, { method: 'POST' });
                 if (hubConnection) hubConnection.invoke('BroadcastAnswerSound', sessionId, 'correct').catch(() => {});
-                if (nextTile === 4) {
-                    // 5th correct answer — turn ends
+                // Finale: 5th correct answer ends the turn
+                if (currentRound === 'Finale' && nextTile === 4) {
                     await fetch(`/api/sessions/${sessionId}/rounds/nextturn`, { method: 'POST' });
                 }
             } catch (err) {
-                console.error('finale correct failed:', err);
+                console.error('marktile failed:', err);
             }
             btnPlayerCorrect.disabled = false;
         } else {
