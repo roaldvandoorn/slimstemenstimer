@@ -11,7 +11,7 @@ See full plan: `archive/PLAN_phase10_rounds.md`
 | # | Description | Status |
 |---|-------------|--------|
 | S1 | Drag-and-drop player ordering in lobby | ✅ Done |
-| S2 | Server model: RoundState + RoundContext | ⬜ Pending |
+| S2 | Server model: RoundState + RoundContext | ✅ Done |
 | S3 | New RoundController + round-control endpoints | ⬜ Pending |
 | S4 | GameHub: new broadcast methods | ⬜ Pending |
 | S5 | Scoreboard rework (round header + tile area) | ⬜ Pending |

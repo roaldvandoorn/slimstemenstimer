@@ -45,6 +45,15 @@ public class SessionsController : ControllerBase
             sessionId = session.Id,
             state = session.State.ToString(),
             playerOrder = session.PlayerOrder,
+            roundContext = new
+            {
+                round = session.Round.Round.ToString(),
+                candidateId = session.Round.CandidateId,
+                quizmasterId = session.Round.QuizmasterId,
+                questionIndex = session.Round.QuestionIndex,
+                answerTiles = session.Round.AnswerTiles,
+                finalistIds = session.Round.FinalistIds
+            },
             players = session.Players.Values.Select(p => new
             {
                 playerId = p.Id,
