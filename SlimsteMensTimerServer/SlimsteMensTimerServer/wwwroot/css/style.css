@@ -278,6 +278,99 @@ body {
   word-break: break-word;
 }
 
+/* ── Round header ─────────────────────────────────────── */
+
+.round-header {
+  text-align: center;
+  font-size: 1.6rem;
+  font-weight: bold;
+  letter-spacing: 0.05em;
+  color: var(--accent);
+  margin-bottom: 1.25rem;
+  padding: 0.5rem 0;
+}
+
+/* ── Role highlights on player tiles ─────────────────── */
+
+.player-tile.candidate-highlight {
+  border-left: 5px solid #FFC107;
+  padding-left: calc(1rem - 5px);
+}
+
+.player-tile.quizmaster-highlight {
+  border-left: 5px solid #4DD0E1;
+  padding-left: calc(1rem - 5px);
+}
+
+/* ── Round tiles ──────────────────────────────────────── */
+
+.round-tiles {
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin: 1.5rem 0 0.5rem;
+}
+
+.round-tiles-369 {
+  gap: 0.4rem;
+}
+
+.tile-grid-2x5 {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  grid-template-rows: repeat(2, 1fr);
+  gap: 0.5rem;
+  max-width: 400px;
+  margin: 1.5rem auto 0.5rem;
+}
+
+.round-tile {
+  background: rgba(255, 255, 255, 0.12);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  width: 42px;
+  height: 42px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 0.95rem;
+  transition: background 0.25s, border-color 0.25s;
+}
+
+.round-tile.correct {
+  background: rgba(46, 125, 50, 0.6);
+  border-color: rgba(76, 175, 80, 0.8);
+}
+
+.round-tile.scoring {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 1px var(--accent);
+}
+
+.round-tile.current {
+  background: rgba(255, 167, 38, 0.35);
+  border-color: var(--accent);
+  font-size: 1.05rem;
+}
+
+/* ── Round controls (Volgende etc.) ──────────────────── */
+
+.round-controls {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.btn-volgende {
+  background-color: rgba(77, 208, 225, 0.25);
+  border: 2px solid rgba(77, 208, 225, 0.5);
+  min-width: 8rem;
+}
+
+.btn-volgende:hover { background-color: rgba(77, 208, 225, 0.45); opacity: 1; }
+
 /* ── Answer sound buttons ─────────────────────────────── */
 
 .answer-controls {

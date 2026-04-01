@@ -20,14 +20,19 @@
   <!-- Banner: shown when GameEnded or session not found -->
   <div class="banner" id="banner" style="display:none"></div>
 
-  <!-- Scoreboard grid — tiles are added dynamically -->
+  <!-- Round header — shows active round name and question number -->
+  <div class="round-header" id="roundHeader" style="display:none">
+    <span id="roundName"></span>
+  </div>
+
+  <!-- Scoreboard grid — player tiles added dynamically -->
   <div class="scoreboard-grid" id="scoreGrid"></div>
 
-  <!-- Answer sound buttons -->
-  <div class="answer-controls">
-    <button id="btnCorrect" class="btn btn-correct">✓ Goed</button>
-    <button id="btnWrong"   class="btn btn-wrong">✗ Fout</button>
-  </div>
+  <!-- Round tile area — rendered per round type -->
+  <div id="roundTiles" style="display:none"></div>
+
+  <!-- Round controls — Volgende button (Ingelijst) and future round-start buttons -->
+  <div id="roundControls" class="round-controls" style="display:none"></div>
 
   <!-- Host controls -->
   <div class="host-controls">

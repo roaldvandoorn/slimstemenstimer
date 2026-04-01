@@ -8,16 +8,20 @@
     const params    = new URLSearchParams(window.location.search);
     const sessionId = params.get('session');
 
+    let currentContext = null;  // last received RoundContext
+
     // ── DOM refs ─────────────────────────────────────────────────────────────
 
-    const grid       = document.getElementById('scoreGrid');
-    const banner     = document.getElementById('banner');
-    const sessionEl  = document.getElementById('sessionSubtitle');
-    const btnEnd     = document.getElementById('btnEndGame');
-    const btnNew     = document.getElementById('btnNewGame');
-    const btnCorrect = document.getElementById('btnCorrect');
-    const btnWrong   = document.getElementById('btnWrong');
-    const btnMute    = document.getElementById('btnMute');
+    const grid           = document.getElementById('scoreGrid');
+    const banner         = document.getElementById('banner');
+    const sessionEl      = document.getElementById('sessionSubtitle');
+    const btnEnd         = document.getElementById('btnEndGame');
+    const btnNew         = document.getElementById('btnNewGame');
+    const btnMute        = document.getElementById('btnMute');
+    const roundHeaderEl  = document.getElementById('roundHeader');
+    const roundNameEl    = document.getElementById('roundName');
+    const roundTilesEl   = document.getElementById('roundTiles');
+    const roundControlsEl = document.getElementById('roundControls');
 
     // ── Sound engine ─────────────────────────────────────────────────────────
 
@@ -31,12 +35,12 @@
     sounds.clock.loop = true;
 
     let muted        = false;
-    let activeTimers = new Set(); // playerIds with an active countdown
+    let activeTimers = new Set();
 
     function playSound(sound) {
         if (muted) return;
         sound.currentTime = 0;
-        sound.play().catch(() => {}); // suppress autoplay-policy errors
+        sound.play().catch(() => {});
     }
 
     function updateClockLoop() {
@@ -66,7 +70,7 @@
         try {
             const resp = await fetch(`/api/sessions/${sessionId}`, { method: 'DELETE' });
             if (resp.ok) {
-                showGameEnded(); // update host UI immediately; other tabs get it via SignalR
+                showGameEnded();
             } else {
                 btnEnd.disabled = false;
             }
@@ -79,11 +83,6 @@
     btnNew.addEventListener('click', () => {
         window.location.href = '/lobby.html';
     });
-
-    // ── Answer buttons ────────────────────────────────────────────────────────
-
-    btnCorrect.addEventListener('click', () => playSound(sounds.correct));
-    btnWrong.addEventListener('click',   () => playSound(sounds.wrong));
 
     // ── Mute toggle ───────────────────────────────────────────────────────────
 
@@ -107,35 +106,42 @@
         banner.style.display = 'block';
         btnEnd.style.display = 'none';
         btnNew.style.display = 'inline-block';
+        roundHeaderEl.style.display = 'none';
+        roundTilesEl.style.display  = 'none';
+        roundControlsEl.style.display = 'none';
     }
 
     // ── Init ─────────────────────────────────────────────────────────────────
 
     async function init() {
-        await loadPlayers();
+        await loadSession();
         connectSignalR();
-        // Play game-start sound on load — the scoreboard is always opened when the
-        // game starts (lobby navigates here after GameStarted), so the event itself
-        // will never be received by this page.
         playSound(sounds.gameStart);
     }
 
-    async function loadPlayers() {
+    async function loadSession() {
         try {
-            const resp = await fetch(`/api/sessions/${sessionId}/players`);
+            const resp = await fetch(`/api/sessions/${sessionId}`);
             if (!resp.ok) return;
-            const players = await resp.json();
-            players.forEach(p => upsertTile(p.playerId, p.playerName, p.score, p.isStale));
+            const data = await resp.json();
+
+            // Render player tiles
+            if (Array.isArray(data.players)) {
+                data.players.forEach(p => upsertTile(p.playerId, p.playerName, p.score, p.isStale));
+            }
+
+            // Restore round state if game is already in progress
+            if (data.roundContext && data.roundContext.round !== 'None') {
+                renderRound(data.roundContext);
+            }
         } catch (err) {
-            console.error('Failed to load players:', err);
+            console.error('Failed to load session:', err);
         }
     }
 
-    // ── Tile management ───────────────────────────────────────────────────────
+    // ── Score tile management ─────────────────────────────────────────────────
 
-    function tileId(playerId) {
-        return `tile-${playerId}`;
-    }
+    function tileId(playerId) { return `tile-${playerId}`; }
 
     function upsertTile(playerId, playerName, score, isStale) {
         let tile = document.getElementById(tileId(playerId));
@@ -149,11 +155,133 @@
         tile.querySelector('.score').textContent = score;
         tile.querySelector('.name').textContent  = playerName;
         tile.classList.toggle('stale', !!isStale);
+
+        // Re-apply role highlights if a round is active
+        if (currentContext) highlightRoles(currentContext);
     }
 
     function setTileStale(playerId, stale) {
         const tile = document.getElementById(tileId(playerId));
         if (tile) tile.classList.toggle('stale', stale);
+    }
+
+    // ── Round rendering ───────────────────────────────────────────────────────
+
+    const ROUND_LABELS = {
+        Round369:  '3-6-9',
+        OpenDeur:  'Open Deur',
+        Puzzel:    'Puzzel',
+        Ingelijst: 'Ingelijst',
+        Finale:    'Finale',
+    };
+    const SCORING_QUESTIONS = new Set([3, 6, 9, 12, 15]);
+
+    function renderRound(ctx) {
+        currentContext = ctx;
+
+        // Round header
+        const label = ROUND_LABELS[ctx.round] || '';
+        if (label) {
+            const suffix = ctx.round === 'Round369'
+                ? ` — Vraag ${ctx.questionIndex} / 15`
+                : '';
+            roundNameEl.textContent = label + suffix;
+            roundHeaderEl.style.display = 'block';
+        } else {
+            roundHeaderEl.style.display = 'none';
+        }
+
+        // Score tile visibility (Finale hides non-finalists)
+        document.querySelectorAll('.player-tile').forEach(tile => {
+            const pid = tile.id.replace('tile-', '');
+            if (ctx.round === 'Finale') {
+                tile.style.display = ctx.finalistIds.includes(pid) ? '' : 'none';
+            } else {
+                tile.style.display = '';
+            }
+        });
+
+        // Role highlights
+        highlightRoles(ctx);
+
+        // Round-specific tile area
+        renderRoundTiles(ctx);
+    }
+
+    function highlightRoles(ctx) {
+        document.querySelectorAll('.player-tile').forEach(tile => {
+            const pid = tile.id.replace('tile-', '');
+            tile.classList.remove('candidate-highlight', 'quizmaster-highlight');
+            if (pid === ctx.candidateId)   tile.classList.add('candidate-highlight');
+            else if (pid === ctx.quizmasterId) tile.classList.add('quizmaster-highlight');
+        });
+    }
+
+    function renderRoundTiles(ctx) {
+        roundTilesEl.innerHTML   = '';
+        roundControlsEl.innerHTML = '';
+        roundTilesEl.style.display   = 'none';
+        roundControlsEl.style.display = 'none';
+
+        switch (ctx.round) {
+            case 'Round369':  renderRound369Tiles(ctx);           break;
+            case 'OpenDeur':  renderAnswerTiles(ctx.answerTiles, 4); break;
+            case 'Puzzel':    renderAnswerTiles(ctx.answerTiles, 3); break;
+            case 'Ingelijst': renderIngelijstTiles(ctx);          break;
+            // Finale: no tile area
+        }
+    }
+
+    function renderRound369Tiles(ctx) {
+        roundTilesEl.className   = 'round-tiles round-tiles-369';
+        roundTilesEl.style.display = 'flex';
+        for (let i = 1; i <= 15; i++) {
+            const box = document.createElement('div');
+            box.className = 'round-tile';
+            if (SCORING_QUESTIONS.has(i))  box.classList.add('scoring');
+            if (i === ctx.questionIndex)   box.classList.add('current');
+            if (ctx.answerTiles[i - 1])    box.classList.add('correct');
+            box.textContent = i;
+            roundTilesEl.appendChild(box);
+        }
+    }
+
+    function renderAnswerTiles(answerTiles, count) {
+        roundTilesEl.className   = 'round-tiles';
+        roundTilesEl.style.display = 'flex';
+        for (let i = 0; i < count; i++) {
+            const box = document.createElement('div');
+            box.className = 'round-tile' + (answerTiles[i] ? ' correct' : '');
+            box.textContent = i + 1;
+            roundTilesEl.appendChild(box);
+        }
+    }
+
+    function renderIngelijstTiles(ctx) {
+        roundTilesEl.className   = 'round-tiles tile-grid-2x5';
+        roundTilesEl.style.display = 'grid';
+        for (let i = 0; i < 10; i++) {
+            const box = document.createElement('div');
+            box.className = 'round-tile' + (ctx.answerTiles[i] ? ' correct' : '');
+            box.textContent = i + 1;
+            roundTilesEl.appendChild(box);
+        }
+
+        // Volgende button — visible on scoreboard per confirmed decision #1
+        const btn = document.createElement('button');
+        btn.className   = 'btn btn-volgende';
+        btn.textContent = 'Volgende';
+        btn.addEventListener('click', async () => {
+            btn.disabled = true;
+            try {
+                await fetch(`/api/sessions/${sessionId}/rounds/nextquizmaster`, { method: 'POST' });
+            } catch (err) {
+                console.error('nextquizmaster failed:', err);
+            }
+            btn.disabled = false;
+        });
+        roundControlsEl.appendChild(btn);
+        roundControlsEl.style.display = 'flex';
     }
 
     // ── SignalR ──────────────────────────────────────────────────────────────
@@ -177,13 +305,8 @@
             }
         });
 
-        connection.on('PlayerWentStale', (playerId) => {
-            setTileStale(playerId, true);
-        });
-
-        connection.on('PlayerReturned', (playerId) => {
-            setTileStale(playerId, false);
-        });
+        connection.on('PlayerWentStale', playerId => setTileStale(playerId, true));
+        connection.on('PlayerReturned',  playerId => setTileStale(playerId, false));
 
         connection.on('GameEnded', () => {
             activeTimers.clear();
@@ -191,19 +314,44 @@
             showGameEnded();
         });
 
-        connection.on('AnswerSound', (soundType) => {
+        connection.on('AnswerSound', soundType => {
             if (soundType === 'correct') playSound(sounds.correct);
             else if (soundType === 'wrong') playSound(sounds.wrong);
         });
 
-        connection.on('TimerStarted', (playerId) => {
+        connection.on('TimerStarted', playerId => {
             activeTimers.add(playerId);
             updateClockLoop();
         });
 
-        connection.on('TimerStopped', (playerId) => {
+        connection.on('TimerStopped', playerId => {
             activeTimers.delete(playerId);
             updateClockLoop();
+        });
+
+        // ── Round events ─────────────────────────────────────────────────────
+
+        connection.on('RoundChanged', ctx => {
+            renderRound(ctx);
+        });
+
+        connection.on('TileMarked', (tileIndex, _round) => {
+            if (!currentContext) return;
+            currentContext.answerTiles[tileIndex] = true;
+            renderRoundTiles(currentContext);
+        });
+
+        connection.on('QuestionAdvanced', questionIndex => {
+            if (!currentContext) return;
+            currentContext.questionIndex = questionIndex;
+            renderRound(currentContext);  // re-render header + tiles
+        });
+
+        connection.on('TurnAdvanced', (candidateId, quizmasterId) => {
+            if (!currentContext) return;
+            currentContext.candidateId   = candidateId;
+            currentContext.quizmasterId  = quizmasterId;
+            highlightRoles(currentContext);
         });
 
         connection.start()
