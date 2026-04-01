@@ -16,7 +16,7 @@ See full plan: `archive/PLAN_phase10_rounds.md`
 | S4 | GameHub: new broadcast methods | ✅ Done |
 | S5 | Scoreboard rework (round header + tile area) | ✅ Done |
 | S6 | Player page rework: role-aware controls | ✅ Done |
-| S7 | Round 3-6-9 auto-start + advancement logic | ⬜ Pending |
+| S7 | Round 3-6-9 auto-start + advancement logic | ✅ Done |
 | S8 | Rounds OpenDeur, Puzzel, Ingelijst: start-flow + advancement | ⬜ Pending |
 | S9 | Finale round | ⬜ Pending |
 | S10 | Integration, polish, and state restore on rejoin | ⬜ Pending |

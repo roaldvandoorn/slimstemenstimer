@@ -230,4 +230,17 @@ public class RoundService
         tiles[tileIndex] = true;
         return true;
     }
+
+    // ── SignalR payload ───────────────────────────────────────────────────────
+
+    /// Builds the canonical RoundChanged payload used by all controllers.
+    public static object BuildRoundPayload(Session session) => new
+    {
+        round         = session.Round.Round.ToString(),
+        candidateId   = session.Round.CandidateId,
+        quizmasterId  = session.Round.QuizmasterId,
+        questionIndex = session.Round.QuestionIndex,
+        answerTiles   = session.Round.AnswerTiles,
+        finalistIds   = session.Round.FinalistIds
+    };
 }

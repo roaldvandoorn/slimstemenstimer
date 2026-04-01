@@ -73,12 +73,40 @@ public class RoundController : ControllerBase
         return Ok(new { tileIndex, marked = true });
     }
 
+    // POST /api/sessions/{sessionId}/rounds/correct
+    // Round369 only: quizmaster signals a correct answer.
+    // Marks the current question tile, advances the question index (candidate stays),
+    // and broadcasts TileMarked + QuestionAdvanced + AnswerSound('correct').
+    [HttpPost("correct")]
+    public async Task<IActionResult> Correct(string sessionId)
+    {
+        var session = _store.GetSession(sessionId);
+        if (session is null) return NotFound();
+        if (session.State != SessionState.Active)
+            return Conflict(new { error = "Session is not Active." });
+        if (session.Round.Round != RoundState.Round369)
+            return Conflict(new { error = "correct is only valid during Round369." });
+
+        var tileIndex = session.Round.QuestionIndex - 1;  // 0-based
+        RoundService.MarkTile(session, tileIndex);
+        RoundService.NextQuestion(session);
+
+        await _hub.Clients.Group(sessionId)
+            .SendAsync("TileMarked", tileIndex, RoundState.Round369.ToString());
+        await _hub.Clients.Group(sessionId)
+            .SendAsync("QuestionAdvanced", session.Round.QuestionIndex);
+        await _hub.Clients.Group(sessionId)
+            .SendAsync("AnswerSound", "correct");
+
+        return Ok(new { questionIndex = session.Round.QuestionIndex });
+    }
+
     // POST /api/sessions/{sessionId}/rounds/nextturn
     // Advances candidate/quizmaster roles per round rules.
     // Round369: both roles move in lockstep; auto-advances question when all players have attempted.
     // OpenDeur/Puzzel: candidate moves; quizmaster rotates when all candidates have had a turn.
     // Finale: candidate toggles between finalists; question advances after both have gone.
-    // Called by: candidate's "Klaar" button (OpenDeur/Puzzel/Ingelijst), or by round logic (Round369 ✗).
+    // Called by: candidate's "Klaar" button (OpenDeur/Puzzel/Ingelijst), or Round369 quizmaster ✗.
     [HttpPost("nextturn")]
     public async Task<IActionResult> NextTurn(string sessionId)
     {
@@ -88,6 +116,11 @@ public class RoundController : ControllerBase
             return Conflict(new { error = "Session is not Active." });
 
         bool questionAdvanced = _rounds.NextTurn(session);
+
+        // In Round369, ✗ triggers the turn; broadcast the wrong-answer sound here
+        // so the quizmaster only needs one button press with no extra client-side hub call.
+        if (session.Round.Round == RoundState.Round369)
+            await _hub.Clients.Group(sessionId).SendAsync("AnswerSound", "wrong");
 
         await _hub.Clients.Group(sessionId)
             .SendAsync("TurnAdvanced", session.Round.CandidateId, session.Round.QuizmasterId);

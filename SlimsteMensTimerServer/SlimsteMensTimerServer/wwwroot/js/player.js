@@ -304,14 +304,38 @@
         applyScore(SCORE_DEFAULT);
     });
 
-    btnPlayerCorrect.addEventListener('click', () => {
-        if (gameEnded || !hubConnection || btnPlayerCorrect.disabled) return;
-        hubConnection.invoke('BroadcastAnswerSound', sessionId, 'correct').catch(() => {});
+    btnPlayerCorrect.addEventListener('click', async () => {
+        if (gameEnded || btnPlayerCorrect.disabled) return;
+        if (currentRound === 'Round369') {
+            // Quizmaster signals correct answer — REST handles tile + advance + sound
+            btnPlayerCorrect.disabled = true;
+            try {
+                await fetch(`/api/sessions/${sessionId}/rounds/correct`, { method: 'POST' });
+            } catch (err) {
+                console.error('correct failed:', err);
+            }
+            btnPlayerCorrect.disabled = false;
+        } else {
+            if (!hubConnection) return;
+            hubConnection.invoke('BroadcastAnswerSound', sessionId, 'correct').catch(() => {});
+        }
     });
 
-    btnPlayerWrong.addEventListener('click', () => {
-        if (gameEnded || !hubConnection || btnPlayerWrong.disabled) return;
-        hubConnection.invoke('BroadcastAnswerSound', sessionId, 'wrong').catch(() => {});
+    btnPlayerWrong.addEventListener('click', async () => {
+        if (gameEnded || btnPlayerWrong.disabled) return;
+        if (currentRound === 'Round369') {
+            // Quizmaster signals wrong answer — REST handles turn + sound
+            btnPlayerWrong.disabled = true;
+            try {
+                await fetch(`/api/sessions/${sessionId}/rounds/nextturn`, { method: 'POST' });
+            } catch (err) {
+                console.error('nextturn failed:', err);
+            }
+            btnPlayerWrong.disabled = false;
+        } else {
+            if (!hubConnection) return;
+            hubConnection.invoke('BroadcastAnswerSound', sessionId, 'wrong').catch(() => {});
+        }
     });
 
     // ── Round controls ────────────────────────────────────────────────────────

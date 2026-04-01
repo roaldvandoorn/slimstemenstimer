@@ -183,7 +183,7 @@
         const label = ROUND_LABELS[ctx.round] || '';
         if (label) {
             const suffix = ctx.round === 'Round369'
-                ? ` — Vraag ${ctx.questionIndex} / 15`
+                ? ` — Vraag ${Math.min(ctx.questionIndex, 15)} / 15`
                 : '';
             roundNameEl.textContent = label + suffix;
             roundHeaderEl.style.display = 'block';

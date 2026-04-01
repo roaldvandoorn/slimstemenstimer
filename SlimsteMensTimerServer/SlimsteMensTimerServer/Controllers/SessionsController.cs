@@ -13,12 +13,14 @@ public class SessionsController : ControllerBase
     private readonly SessionStore _store;
     private readonly IpAddressHelper _ipHelper;
     private readonly IHubContext<GameHub> _hub;
+    private readonly RoundService _rounds;
 
-    public SessionsController(SessionStore store, IpAddressHelper ipHelper, IHubContext<GameHub> hub)
+    public SessionsController(SessionStore store, IpAddressHelper ipHelper, IHubContext<GameHub> hub, RoundService rounds)
     {
-        _store = store;
+        _store    = store;
         _ipHelper = ipHelper;
-        _hub = hub;
+        _hub      = hub;
+        _rounds   = rounds;
     }
 
     // POST /api/sessions
@@ -99,10 +101,13 @@ public class SessionsController : ControllerBase
                 .Select(p => p.Id)
                 .ToList();
 
+        _rounds.InitialiseRound369(session);
+
         if (!_store.StartSession(sessionId))
             return Conflict(new { error = "Session is not in Lobby state." });
 
         await _hub.Clients.Group(sessionId).SendAsync("GameStarted");
+        await _hub.Clients.Group(sessionId).SendAsync("RoundChanged", RoundService.BuildRoundPayload(session));
         return Ok(new { state = "Active" });
     }
 
