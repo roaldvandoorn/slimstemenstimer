@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using SlimsteMensTimerServer.Hubs;
+using SlimsteMensTimerServer.Models;
 using SlimsteMensTimerServer.Services;
 
 namespace SlimsteMensTimerServer.Controllers;
@@ -43,6 +44,7 @@ public class SessionsController : ControllerBase
         {
             sessionId = session.Id,
             state = session.State.ToString(),
+            playerOrder = session.PlayerOrder,
             players = session.Players.Values.Select(p => new
             {
                 playerId = p.Id,
@@ -53,15 +55,44 @@ public class SessionsController : ControllerBase
         });
     }
 
+    // PUT /api/sessions/{sessionId}/playerorder
+    [HttpPut("{sessionId}/playerorder")]
+    public IActionResult SetPlayerOrder(string sessionId, [FromBody] SetPlayerOrderRequest request)
+    {
+        var session = _store.GetSession(sessionId);
+        if (session is null) return NotFound();
+        if (session.State != SessionState.Lobby)
+            return Conflict(new { error = "Can only set player order in Lobby state." });
+
+        var validIds = session.Players.Keys.ToHashSet();
+        if (request.Order.Count != validIds.Count || !request.Order.All(validIds.Contains))
+            return BadRequest(new { error = "Order must contain exactly all session player IDs." });
+
+        session.PlayerOrder = new List<string>(request.Order);
+        return Ok();
+    }
+
     // POST /api/sessions/{sessionId}/start
     [HttpPost("{sessionId}/start")]
     public async Task<IActionResult> StartSession(string sessionId)
     {
-        if (!_store.StartSession(sessionId))
-        {
-            if (_store.GetSession(sessionId) is null) return NotFound();
+        var session = _store.GetSession(sessionId);
+        if (session is null) return NotFound();
+        if (session.State != SessionState.Lobby)
             return Conflict(new { error = "Session is not in Lobby state." });
-        }
+        if (session.Players.Count < 3)
+            return Conflict(new { error = "At least 3 players are required to start." });
+
+        // Default to join order when no drag-and-drop order was set
+        if (session.PlayerOrder.Count == 0)
+            session.PlayerOrder = session.Players.Values
+                .OrderBy(p => p.JoinedAt)
+                .Select(p => p.Id)
+                .ToList();
+
+        if (!_store.StartSession(sessionId))
+            return Conflict(new { error = "Session is not in Lobby state." });
+
         await _hub.Clients.Group(sessionId).SendAsync("GameStarted");
         return Ok(new { state = "Active" });
     }
