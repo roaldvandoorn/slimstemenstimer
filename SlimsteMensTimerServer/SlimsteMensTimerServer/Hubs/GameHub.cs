@@ -67,6 +67,46 @@ public class GameHub : Hub
         await Clients.Group(sessionId).SendAsync("AnswerSound", soundType);
     }
 
+    // ── Round event relays ───────────────────────────────────────────────────
+    // These mirror what the REST controllers broadcast via IHubContext.
+    // Client pages that change round state via REST do not need these —
+    // the REST endpoint broadcasts on their behalf. These are provided for
+    // any client that needs to relay a round event directly (e.g., scoreboard
+    // acting as session host without a round REST call).
+
+    /// <summary>
+    /// Relays a RoundChanged event to all session group members.
+    /// Payload shape must match what RoundController.RoundContextPayload sends.
+    /// </summary>
+    public async Task BroadcastRoundChanged(string sessionId, object roundContext)
+    {
+        await Clients.Group(sessionId).SendAsync("RoundChanged", roundContext);
+    }
+
+    /// <summary>
+    /// Relays a TileMarked event to all session group members.
+    /// </summary>
+    public async Task BroadcastTileMarked(string sessionId, int tileIndex, string round)
+    {
+        await Clients.Group(sessionId).SendAsync("TileMarked", tileIndex, round);
+    }
+
+    /// <summary>
+    /// Relays a QuestionAdvanced event to all session group members.
+    /// </summary>
+    public async Task BroadcastQuestionAdvanced(string sessionId, int questionIndex)
+    {
+        await Clients.Group(sessionId).SendAsync("QuestionAdvanced", questionIndex);
+    }
+
+    /// <summary>
+    /// Relays a TurnAdvanced event to all session group members.
+    /// </summary>
+    public async Task BroadcastTurnAdvanced(string sessionId, string candidateId, string quizmasterId)
+    {
+        await Clients.Group(sessionId).SendAsync("TurnAdvanced", candidateId, quizmasterId);
+    }
+
     /// <summary>
     /// Called automatically when a browser client disconnects.
     /// ASP.NET Core SignalR removes the connection from all groups automatically,

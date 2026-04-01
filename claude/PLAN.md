@@ -13,7 +13,7 @@ See full plan: `archive/PLAN_phase10_rounds.md`
 | S1 | Drag-and-drop player ordering in lobby | ✅ Done |
 | S2 | Server model: RoundState + RoundContext | ✅ Done |
 | S3 | New RoundController + round-control endpoints | ✅ Done |
-| S4 | GameHub: new broadcast methods | ⬜ Pending |
+| S4 | GameHub: new broadcast methods | ✅ Done |
 | S5 | Scoreboard rework (round header + tile area) | ⬜ Pending |
 | S6 | Player page rework: role-aware controls | ⬜ Pending |
 | S7 | Round 3-6-9 auto-start + advancement logic | ⬜ Pending |
