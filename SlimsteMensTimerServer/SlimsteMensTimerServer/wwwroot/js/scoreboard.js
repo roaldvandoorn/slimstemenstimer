@@ -182,9 +182,13 @@
         // Round header
         const label = ROUND_LABELS[ctx.round] || '';
         if (label) {
-            const suffix = ctx.round === 'Round369'
-                ? ` — Vraag ${Math.min(ctx.questionIndex, 15)} / 15`
-                : '';
+            const playerCount = document.querySelectorAll('.player-tile').length;
+            let suffix = '';
+            if (ctx.round === 'Round369') {
+                suffix = ` — Vraag ${Math.min(ctx.questionIndex, 15)} / 15`;
+            } else if (ctx.round === 'OpenDeur' || ctx.round === 'Puzzel' || ctx.round === 'Ingelijst') {
+                suffix = ` — Vraag ${ctx.questionIndex} van ${playerCount}`;
+            }
             roundNameEl.textContent = label + suffix;
             roundHeaderEl.style.display = 'block';
         } else {
@@ -384,10 +388,11 @@
             renderRound(currentContext);
         });
 
-        connection.on('TurnAdvanced', (candidateId, quizmasterId) => {
+        connection.on('TurnAdvanced', (candidateId, quizmasterId, questionIndex) => {
             if (!currentContext) return;
             currentContext.candidateId   = candidateId;
             currentContext.quizmasterId  = quizmasterId;
+            if (questionIndex !== undefined) currentContext.questionIndex = questionIndex;
             // Finale: each turn gets a fresh set of 5 tiles
             if (currentContext.round === 'Finale') {
                 currentContext.answerTiles = new Array(5).fill(false);

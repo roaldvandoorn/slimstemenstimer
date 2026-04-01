@@ -470,6 +470,19 @@ body {
   margin-bottom: 0.25rem;
 }
 
+.player-role-indicator {
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  min-height: 1.2em;
+  color: rgba(255, 167, 38, 0.9);   /* amber — matches candidate highlight */
+}
+
+.player-role-indicator.quizmaster {
+  color: rgba(77, 208, 225, 0.9);   /* teal — matches quizmaster highlight */
+}
+
 .player-own-score {
   font-size: 6rem;
   font-weight: bold;

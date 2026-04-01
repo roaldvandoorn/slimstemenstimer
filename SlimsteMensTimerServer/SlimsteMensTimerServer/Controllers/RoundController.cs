@@ -123,7 +123,7 @@ public class RoundController : ControllerBase
             await _hub.Clients.Group(sessionId).SendAsync("AnswerSound", "wrong");
 
         await _hub.Clients.Group(sessionId)
-            .SendAsync("TurnAdvanced", session.Round.CandidateId, session.Round.QuizmasterId);
+            .SendAsync("TurnAdvanced", session.Round.CandidateId, session.Round.QuizmasterId, session.Round.QuestionIndex);
 
         if (questionAdvanced)
             await _hub.Clients.Group(sessionId)

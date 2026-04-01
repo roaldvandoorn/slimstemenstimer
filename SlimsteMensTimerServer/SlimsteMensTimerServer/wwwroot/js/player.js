@@ -53,6 +53,7 @@
 
     const btnPlayerCorrect = document.getElementById('btnPlayerCorrect');
     const btnPlayerWrong   = document.getElementById('btnPlayerWrong');
+    const roleIndicator    = document.getElementById('roleIndicator');
 
     const othersSidebar = document.getElementById('othersSidebar');
     const othersBottom  = document.getElementById('othersBottom');
@@ -149,6 +150,16 @@
                 // 'finalist-inactive' and 'other': only +20/-20 (already true)
             }
         }
+
+        // Role indicator (shown for candidate and quizmaster only)
+        const ROLE_LABELS = {
+            'candidate':         'Kandidaat',
+            'quizmaster':        'Quizmaster',
+            'finalist-active':   'Finalist',
+            'finalist-inactive': 'Finalist',
+        };
+        roleIndicator.textContent = (role && ROLE_LABELS[role]) || '';
+        roleIndicator.className   = 'player-role-indicator' + (role === 'quizmaster' ? ' quizmaster' : '');
 
         // Stop a running timer if the player's role no longer allows Start/Stop
         if (!startEn && timerRunning) stopTimer();
@@ -514,10 +525,11 @@
             }
         });
 
-        connection.on('TurnAdvanced', (candidateId, quizmasterId) => {
+        connection.on('TurnAdvanced', (candidateId, quizmasterId, questionIndex) => {
             if (!currentContext) return;
             currentContext.candidateId  = candidateId;
             currentContext.quizmasterId = quizmasterId;
+            if (questionIndex !== undefined) currentContext.questionIndex = questionIndex;
             // Finale: each turn gets a fresh set of 5 tiles
             if (currentContext.round === 'Finale') {
                 currentContext.answerTiles = new Array(5).fill(false);
