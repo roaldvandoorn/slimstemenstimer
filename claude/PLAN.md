@@ -20,7 +20,7 @@ See full plan: `archive/PLAN_phase10_rounds.md`
 | S8 | Rounds OpenDeur, Puzzel, Ingelijst: start-flow + advancement | ✅ Done |
 | S9 | Finale round | ✅ Done |
 | S10 | Integration, polish, and state restore on rejoin | ✅ Done |
-| S11 | Sound effect wiring for new rounds | ⬜ Pending |
+| S11 | Sound effect wiring for new rounds | ✅ Done |
 | S12 | Final review + documentation | ⬜ Pending |
 
 ---

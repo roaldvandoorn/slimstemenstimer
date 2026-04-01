@@ -158,6 +158,9 @@
             }
         }
 
+        // Stop a running timer if the player's role no longer allows Start/Stop
+        if (!startEn && timerRunning) stopTimer();
+
         btnMinus.disabled         = !minusEn;
         btnPlus.disabled          = !plusEn;
         btnStart.disabled         = !startEn;
@@ -345,6 +348,7 @@
 
     btnKlaar.addEventListener('click', async () => {
         if (btnKlaar.disabled) return;
+        stopTimer();  // ensure clock stops before turn advances
         btnKlaar.disabled = true;
         try {
             await fetch(`/api/sessions/${sessionId}/rounds/nextturn`, { method: 'POST' });
