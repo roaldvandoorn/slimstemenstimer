@@ -48,18 +48,46 @@
       <div class="player-own-name" id="ownName"></div>
       <div class="player-own-score" id="ownScore">60</div>
 
+      <!-- Primary controls: always rendered, enabled/disabled per role -->
       <div class="player-controls">
         <button class="btn btn-danger player-score-btn" id="btnMinus">−20</button>
         <button class="btn player-start-btn" id="btnStart">▶ Start</button>
         <button class="btn btn-danger player-score-btn" id="btnPlus">+20</button>
       </div>
-      <div style="text-align:center; margin-top:1.25rem">
-        <button class="btn btn-danger" id="btnReset" style="font-size:.9rem; padding:10px 28px">↺ Herstel (60)</button>
+
+      <!-- Klaar button: candidate turn-end in OpenDeur / Puzzel / Ingelijst -->
+      <div id="klaarPanel" style="display:none; text-align:center; margin-top:1rem">
+        <button class="btn" id="btnKlaar">Klaar</button>
       </div>
 
+      <!-- Answer buttons: quizmaster in non-Ingelijst rounds -->
       <div class="answer-controls" style="margin-top:1.25rem">
         <button id="btnPlayerCorrect" class="btn btn-correct">✓ Goed</button>
         <button id="btnPlayerWrong"   class="btn btn-wrong">✗ Fout</button>
+      </div>
+
+      <!-- Ingelijst quizmaster panel: 10 tile buttons + Volgende -->
+      <div id="ingelijstPanel" style="display:none; margin-top:1.25rem">
+        <div class="ingelijst-tiles">
+          <button class="btn ingelijst-tile" data-tile="0">1</button>
+          <button class="btn ingelijst-tile" data-tile="1">2</button>
+          <button class="btn ingelijst-tile" data-tile="2">3</button>
+          <button class="btn ingelijst-tile" data-tile="3">4</button>
+          <button class="btn ingelijst-tile" data-tile="4">5</button>
+          <button class="btn ingelijst-tile" data-tile="5">6</button>
+          <button class="btn ingelijst-tile" data-tile="6">7</button>
+          <button class="btn ingelijst-tile" data-tile="7">8</button>
+          <button class="btn ingelijst-tile" data-tile="8">9</button>
+          <button class="btn ingelijst-tile" data-tile="9">10</button>
+        </div>
+        <div style="text-align:center; margin-top:1rem">
+          <button class="btn btn-volgende" id="btnVolgende">Volgende</button>
+        </div>
+      </div>
+
+      <!-- Reset -->
+      <div style="text-align:center; margin-top:1.25rem">
+        <button class="btn btn-danger" id="btnReset" style="font-size:.9rem; padding:10px 28px">↺ Herstel (60)</button>
       </div>
 
     </div>

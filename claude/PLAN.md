@@ -15,7 +15,7 @@ See full plan: `archive/PLAN_phase10_rounds.md`
 | S3 | New RoundController + round-control endpoints | ✅ Done |
 | S4 | GameHub: new broadcast methods | ✅ Done |
 | S5 | Scoreboard rework (round header + tile area) | ✅ Done |
-| S6 | Player page rework: role-aware controls | ⬜ Pending |
+| S6 | Player page rework: role-aware controls | ✅ Done |
 | S7 | Round 3-6-9 auto-start + advancement logic | ⬜ Pending |
 | S8 | Rounds OpenDeur, Puzzel, Ingelijst: start-flow + advancement | ⬜ Pending |
 | S9 | Finale round | ⬜ Pending |

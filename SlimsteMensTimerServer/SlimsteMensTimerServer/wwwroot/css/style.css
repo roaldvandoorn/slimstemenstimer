@@ -580,6 +580,29 @@ body {
   .player-others-bottom { display: none; }
 }
 
+/* ── Player page — Ingelijst quizmaster panel ─────────── */
+
+.ingelijst-tiles {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.ingelijst-tile {
+  padding: 0.7rem 0.4rem;
+  font-size: 1rem;
+  border-radius: 8px;
+  min-width: unset;
+}
+
+.ingelijst-tile.correct {
+  background-color: rgba(46, 125, 50, 0.75);
+  border-color: rgba(76, 175, 80, 0.8);
+}
+
+/* ── Join view input ──────────────────────────────────── */
+
 /* Join view input */
 .name-input {
   width: 100%;
