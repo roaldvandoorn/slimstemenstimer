@@ -326,8 +326,8 @@
 
     btnPlayerWrong.addEventListener('click', async () => {
         if (gameEnded || btnPlayerWrong.disabled) return;
-        if (currentRound === 'Round369') {
-            // Quizmaster signals wrong answer — REST handles turn + sound
+        if (currentRound === 'Round369' || currentRound === 'Finale') {
+            // Quizmaster signals end of turn — REST handles turn advance + wrong sound
             btnPlayerWrong.disabled = true;
             try {
                 await fetch(`/api/sessions/${sessionId}/rounds/nextturn`, { method: 'POST' });

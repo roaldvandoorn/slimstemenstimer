@@ -250,8 +250,11 @@
                 renderAnswerTiles(ctx.answerTiles, 3);
                 addStartRoundButton('ingelijst', 'Start Ingelijst');
                 break;
-            case 'Ingelijst': renderIngelijstTiles(ctx);             break;
-            // Finale: no tile area; start button handled in S9
+            case 'Ingelijst':
+                renderIngelijstTiles(ctx);
+                addStartRoundButton('finale', 'Start Finale');
+                break;
+            // Finale: no tile area
         }
     }
 

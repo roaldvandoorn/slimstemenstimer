@@ -117,9 +117,9 @@ public class RoundController : ControllerBase
 
         bool questionAdvanced = _rounds.NextTurn(session);
 
-        // In Round369, ✗ triggers the turn; broadcast the wrong-answer sound here
+        // ✗ triggers the turn in Round369 and Finale; broadcast wrong-answer sound here
         // so the quizmaster only needs one button press with no extra client-side hub call.
-        if (session.Round.Round == RoundState.Round369)
+        if (session.Round.Round is RoundState.Round369 or RoundState.Finale)
             await _hub.Clients.Group(sessionId).SendAsync("AnswerSound", "wrong");
 
         await _hub.Clients.Group(sessionId)

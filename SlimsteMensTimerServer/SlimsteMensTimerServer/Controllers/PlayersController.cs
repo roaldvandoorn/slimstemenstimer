@@ -77,6 +77,19 @@ public class PlayersController : ControllerBase
             await _hub.Clients.Group(sessionId).SendAsync("PlayerReturned", playerId);
 
         await _hub.Clients.Group(sessionId).SendAsync("ScoreUpdated", playerId, player.Name, player.Score);
+
+        // Finale: end the game when a finalist reaches zero
+        var session = _store.GetSession(sessionId);
+        if (session is not null &&
+            session.Round.Round == RoundState.Finale &&
+            session.Round.FinalistIds.Contains(playerId) &&
+            player.Score <= 0)
+        {
+            _store.EndSession(sessionId);
+            await _hub.Clients.Group(sessionId).SendAsync("GameEnded");
+            _store.DeleteSession(sessionId);
+        }
+
         return Ok(new { playerId, score = player.Score });
     }
 
