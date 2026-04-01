@@ -292,6 +292,11 @@
         clearInterval(timerInterval);
         timerInterval = null;
         if (hubConnection) hubConnection.invoke('BroadcastTimerStopped', sessionId, playerId).catch(() => {});
+        // In Finale, stopping the timer ends the turn
+        if (currentRound === 'Finale' && currentRole === 'finalist-active') {
+            fetch(`/api/sessions/${sessionId}/rounds/nextturn`, { method: 'POST' })
+                .catch(err => console.error('Finale nextturn failed:', err));
+        }
     }
 
     function tickTimer() {
@@ -321,6 +326,23 @@
                 console.error('correct failed:', err);
             }
             btnPlayerCorrect.disabled = false;
+        } else if (currentRound === 'Finale') {
+            // Quizmaster marks next correct answer tile; auto-nextturn after 5th
+            if (!currentContext?.answerTiles) return;
+            const nextTile = currentContext.answerTiles.findIndex(t => !t);
+            if (nextTile === -1) return;  // all 5 already marked
+            btnPlayerCorrect.disabled = true;
+            try {
+                await fetch(`/api/sessions/${sessionId}/rounds/marktile/${nextTile}`, { method: 'POST' });
+                if (hubConnection) hubConnection.invoke('BroadcastAnswerSound', sessionId, 'correct').catch(() => {});
+                if (nextTile === 4) {
+                    // 5th correct answer — turn ends
+                    await fetch(`/api/sessions/${sessionId}/rounds/nextturn`, { method: 'POST' });
+                }
+            } catch (err) {
+                console.error('finale correct failed:', err);
+            }
+            btnPlayerCorrect.disabled = false;
         } else {
             if (!hubConnection) return;
             hubConnection.invoke('BroadcastAnswerSound', sessionId, 'correct').catch(() => {});
@@ -329,8 +351,8 @@
 
     btnPlayerWrong.addEventListener('click', async () => {
         if (gameEnded || btnPlayerWrong.disabled) return;
-        if (currentRound === 'Round369' || currentRound === 'Finale') {
-            // Quizmaster signals end of turn — REST handles turn advance + wrong sound
+        if (currentRound === 'Round369') {
+            // Quizmaster signals wrong answer — REST handles turn advance + wrong sound
             btnPlayerWrong.disabled = true;
             try {
                 await fetch(`/api/sessions/${sessionId}/rounds/nextturn`, { method: 'POST' });
@@ -339,6 +361,7 @@
             }
             btnPlayerWrong.disabled = false;
         } else {
+            // Finale and other rounds: wrong sound only, no turn change
             if (!hubConnection) return;
             hubConnection.invoke('BroadcastAnswerSound', sessionId, 'wrong').catch(() => {});
         }
@@ -503,6 +526,10 @@
             if (!currentContext) return;
             currentContext.candidateId  = candidateId;
             currentContext.quizmasterId = quizmasterId;
+            // Finale: each turn gets a fresh set of 5 tiles
+            if (currentContext.round === 'Finale') {
+                currentContext.answerTiles = new Array(5).fill(false);
+            }
             setRole(deriveRole(currentContext), currentContext.round);
         });
 

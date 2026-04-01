@@ -92,15 +92,16 @@ public class RoundService
             .ToList();
 
         ctx.FinalistIds = finalists;
-        ctx.AnswerTiles = [];
+        ctx.AnswerTiles = new bool[5];  // 5 correct answers per turn
 
         // Quizmaster = random non-finalist
         var nonFinalists = order.Where(id => !finalists.Contains(id)).ToList();
         ctx.QuizmasterId = nonFinalists[Random.Shared.Next(nonFinalists.Count)];
 
-        // Candidate = finalist with lower score
+        // Candidate = finalist with lower score (goes first each question)
         ctx.CandidateId = finalists
             .OrderBy(id => session.Players[id].Score)
+            .ThenBy(id => finalists.IndexOf(id))
             .First();
     }
 
@@ -182,14 +183,22 @@ public class RoundService
         var other = ctx.FinalistIds.FirstOrDefault(id => id != ctx.CandidateId);
         if (other is null) return false;
 
-        ctx.CandidateId = other;
         ctx.TurnCycleCount++;
+        ctx.AnswerTiles = new bool[5];  // fresh tiles for whoever goes next
 
-        if (ctx.TurnCycleCount < 2) return false;
+        if (ctx.TurnCycleCount < 2)
+        {
+            ctx.CandidateId = other;
+            return false;
+        }
 
-        // Both finalists have had a turn — new question
+        // Both finalists have had a turn — new question, lowest score goes first
         ctx.QuestionIndex++;
         ctx.TurnCycleCount = 0;
+        ctx.CandidateId = ctx.FinalistIds
+            .OrderBy(id => session.Players[id].Score)
+            .ThenBy(id => ctx.FinalistIds.IndexOf(id))
+            .First();
         return true;
     }
 

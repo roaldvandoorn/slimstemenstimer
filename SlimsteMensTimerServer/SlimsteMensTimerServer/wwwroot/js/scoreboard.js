@@ -254,7 +254,9 @@
                 renderIngelijstTiles(ctx);
                 addStartRoundButton('finale', 'Start Finale');
                 break;
-            // Finale: no tile area
+            case 'Finale':
+                renderAnswerTiles(ctx.answerTiles, 5);
+                break;
         }
     }
 
@@ -375,8 +377,8 @@
         connection.on('QuestionAdvanced', questionIndex => {
             if (!currentContext) return;
             currentContext.questionIndex = questionIndex;
-            // OpenDeur/Puzzel: question advance = quizmaster rotation, tiles reset to all-false
-            if (currentContext.round === 'OpenDeur' || currentContext.round === 'Puzzel') {
+            // OpenDeur/Puzzel/Finale: question advance resets tiles to all-false
+            if (currentContext.round === 'OpenDeur' || currentContext.round === 'Puzzel' || currentContext.round === 'Finale') {
                 currentContext.answerTiles = new Array(currentContext.answerTiles.length).fill(false);
             }
             renderRound(currentContext);
@@ -386,6 +388,11 @@
             if (!currentContext) return;
             currentContext.candidateId   = candidateId;
             currentContext.quizmasterId  = quizmasterId;
+            // Finale: each turn gets a fresh set of 5 tiles
+            if (currentContext.round === 'Finale') {
+                currentContext.answerTiles = new Array(5).fill(false);
+                renderRoundTiles(currentContext);
+            }
             highlightRoles(currentContext);
         });
 
