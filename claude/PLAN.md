@@ -1,6 +1,10 @@
 # De Slimste Mens Timer — Plan
 
-## Phase 10 — Rounds System (De Slimste Mens)
+## Status: Awaiting next phase
+
+---
+
+## Phase 10 — Rounds System (De Slimste Mens) ✅ Complete
 
 Full round structure: 3-6-9, Open Deur, Puzzel, Ingelijst, Finale.
 Role-aware player controls. Lobby drag-and-drop ordering. Round tile indicators on scoreboard.
@@ -21,7 +25,7 @@ See full plan: `archive/PLAN_phase10_rounds.md`
 | S9 | Finale round | ✅ Done |
 | S10 | Integration, polish, and state restore on rejoin | ✅ Done |
 | S11 | Sound effect wiring for new rounds | ✅ Done |
-| S12 | Final review + documentation | ⬜ Pending |
+| S12 | Final review + documentation | ✅ Done |
 
 ---
 
