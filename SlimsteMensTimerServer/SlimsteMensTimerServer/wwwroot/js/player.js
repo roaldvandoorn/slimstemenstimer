@@ -512,7 +512,7 @@
         });
 
         connection.on('TileMarked', (tileIndex, _round) => {
-            // Keep ingelijst panel in sync if it's visible
+            if (currentContext?.answerTiles) currentContext.answerTiles[tileIndex] = true;
             const btn = document.querySelector(`.ingelijst-tile[data-tile="${tileIndex}"]`);
             if (btn) { btn.classList.add('correct'); btn.disabled = true; }
         });

@@ -375,7 +375,11 @@
         connection.on('QuestionAdvanced', questionIndex => {
             if (!currentContext) return;
             currentContext.questionIndex = questionIndex;
-            renderRound(currentContext);  // re-render header + tiles
+            // OpenDeur/Puzzel: question advance = quizmaster rotation, tiles reset to all-false
+            if (currentContext.round === 'OpenDeur' || currentContext.round === 'Puzzel') {
+                currentContext.answerTiles = new Array(currentContext.answerTiles.length).fill(false);
+            }
+            renderRound(currentContext);
         });
 
         connection.on('TurnAdvanced', (candidateId, quizmasterId) => {
