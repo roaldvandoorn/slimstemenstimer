@@ -8,4 +8,5 @@ public class RoundContext
     public int QuestionIndex { get; set; }           // 1-based; 0 = round not yet active
     public bool[] AnswerTiles { get; set; } = [];    // round-specific size (15 / 4 / 3 / 10)
     public List<string> FinalistIds { get; set; } = new();
+    public int TurnCycleCount { get; set; }          // server-internal: tracks turn/cycle progress per round
 }

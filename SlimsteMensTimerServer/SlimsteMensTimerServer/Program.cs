@@ -22,6 +22,7 @@ builder.Services.AddSwaggerGen();
 // Application services
 builder.Services.AddSingleton<SessionStore>();
 builder.Services.AddSingleton<IpAddressHelper>();
+builder.Services.AddSingleton<RoundService>();
 builder.Services.AddHostedService<HeartbeatMonitor>();
 builder.Services.AddSingleton(new StartupInfo(DateTimeOffset.UtcNow));
 
